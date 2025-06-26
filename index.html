@@ -1,15 +1,57 @@
-<!DOCTYPE html>
+// Znajdź alerty dla linii
+            const alerts = findAlerts(data);
+            
+            // Dodaj linie alertów
+            alerts.orange.forEach(alert => {
+                shapes.push({
+                    type: 'line',
+                    x0: alert.time,
+                    y0: 0,
+                    x1: alert.time,
+                    y1: Math.max(...reserves) * 1.1,
+                    line: {
+                        color: '#f39c12',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                });
+            });
+            
+            alerts.red.forEach(alert => {
+                shapes.push({
+                    type: 'line',
+                    x0: alert.time,
+                    y0: 0,
+                    x1: alert.time,
+                    y1: Math.max(...reserves) * 1.1,
+                    line: {
+                        color: '#e74c3c',
+                        width: 3,
+                        dash: 'dot'
+                    }
+                });
+            });<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dashboard PSE - Monitoring prognozowanych rezerw mocy w Krajowym Systemie Elektroenergetycznym">
     <title>PSE Dashboard - Plan koordynacyjny 5-letni</title>
     <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
     <style>
+        * {
+            box-sizing: border-box;
+        }
         body {
             margin: 0;
             font-family: Arial, sans-serif;
             background-color: #f5f5f5;
+            min-width: 320px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 10px;
         }
         .header {
             background-color: #2c3e50;
@@ -20,30 +62,35 @@
         }
         .header h1 {
             margin: 0 0 10px 0;
+            font-size: clamp(1.3rem, 4vw, 2rem);
         }
         .header p {
             margin: 0;
             color: #ecf0f1;
+            font-size: clamp(0.9rem, 2vw, 1rem);
         }
         .info-bar {
             background-color: #e8f4f8;
             padding: 12px;
-            margin: 20px;
+            margin: 20px auto;
             border-radius: 8px;
             text-align: center;
             border: 1px solid #2980b9;
             font-size: 13px;
+            max-width: 1200px;
+            word-wrap: break-word;
         }
         #chart {
-            margin: 20px;
+            margin: 20px auto;
             background: white;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             padding: 20px;
+            min-height: 300px;
         }
         .alert-summary {
             background: white;
-            margin: 20px;
+            margin: 20px auto;
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -78,6 +125,21 @@
         .danger {
             color: #e74c3c;
         }
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 5px;
+            }
+            .header {
+                padding: 15px 10px;
+            }
+            #chart, .alert-summary, .info-bar {
+                margin: 10px 5px;
+                padding: 15px 10px;
+            }
+            .refresh-btn {
+                margin: 10px auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -86,17 +148,19 @@
         <p>Monitoring prognozowanych rezerw mocy w Krajowym Systemie Elektroenergetycznym</p>
     </div>
     
-    <div class="info-bar" id="infoBar">
-        Ładowanie danych...
+    <div class="container">
+        <div class="info-bar" id="infoBar">
+            Ładowanie danych...
+        </div>
+        
+        <div id="chart"></div>
+        
+        <div class="alert-summary" id="alertSummary">
+            <h3>Ładowanie alertów...</h3>
+        </div>
+        
+        <button class="refresh-btn" onclick="refreshData()">Odśwież</button>
     </div>
-    
-    <div id="chart"></div>
-    
-    <div class="alert-summary" id="alertSummary">
-        <h3>Ładowanie alertów...</h3>
-    </div>
-    
-    <button class="refresh-btn" onclick="refreshData()">Odśwież</button>
 
     <script>
         // Konfiguracja
@@ -118,25 +182,63 @@
             const startDate = startOfToday.toISOString().split('T')[0];
             const endDate = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             
+            console.log('Fetching data from:', startDate, 'to:', endDate);
+            
             try {
-                // Próba z filtrem
-                let url = `${API_URL}?$filter=plan_dtime ge '${startDate}' and plan_dtime le '${endDate}'&$orderby=plan_dtime`;
-                let response = await fetch(url);
+                // Próba z filtrem i limitem
+                let url = `${API_URL}?$filter=plan_dtime ge '${startDate}' and plan_dtime le '${endDate}'&$orderby=plan_dtime&$first=200`;
+                console.log('Trying URL:', url);
+                
+                let response;
+                try {
+                    response = await fetch(url, {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                } catch (fetchError) {
+                    console.error('Fetch error with filter:', fetchError);
+                    // Spróbuj bez filtra
+                    response = await fetch(API_URL + '?$first=200', {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                }
                 
                 if (!response.ok) {
-                    // Bez filtra
-                    response = await fetch(API_URL);
+                    console.log('Filter failed (status:', response.status, '), trying simple API...');
+                    // Bez filtra ale z limitem
+                    response = await fetch(API_URL + '?$first=200', {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
                 }
                 
                 if (response.ok) {
                     const data = await response.json();
-                    return processData(data.value || []);
+                    console.log('API returned', data.value?.length || 0, 'records');
+                    if (data.value && data.value.length > 0) {
+                        return processData(data.value);
+                    } else {
+                        console.warn('API returned empty data array');
+                        return [];
+                    }
+                } else {
+                    console.error('API returned error:', response.status);
+                    return [];
                 }
             } catch (error) {
                 console.error('API Error:', error);
+                return [];
             }
-            
-            return null;
         }
         
         // Przetwarzanie danych
@@ -144,6 +246,14 @@
             const now = new Date();
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             const processed = [];
+            
+            // Sprawdź czy są dane
+            if (!rawData || rawData.length === 0) {
+                console.log('No raw data to process');
+                return [];
+            }
+            
+            console.log(`Processing ${rawData.length} raw data records`);
             
             // Szukaj danych przyszłych
             const futureData = rawData.filter(item => {
@@ -154,43 +264,125 @@
                 return false;
             });
             
-            const dataToUse = futureData.length > 0 ? futureData : rawData;
+            // Jeśli nie ma danych przyszłych, użyj historycznych i przesuń je
+            if (futureData.length === 0) {
+                console.log('No future data found, shifting historical data...');
+                console.log(`Will generate ${Math.min(72, rawData.length)} hours from historical data`);
+                
+                // Generuj 72 godziny od dziś 00:00
+                for (let i = 0; i < 72; i++) {
+                    const timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
+                    const dataIndex = i % rawData.length; // Powtarzaj dane jeśli za mało
+                    const item = rawData[dataIndex];
+                    
+                    if (item && item.req_pow_res) {
+                        // Oblicz dostępną rezerwę
+                        let available = 0;
+                        if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
+                            available = parseFloat(item.surplus_cap_avail_tso);
+                        } else if (item.avail_cap_gen_units_stor_prov !== null && item.avail_cap_gen_units_stor_prov !== undefined) {
+                            available = parseFloat(item.avail_cap_gen_units_stor_prov);
+                        }
+                        
+                        if (available === 0 || isNaN(available)) {
+                            available = parseFloat(item.req_pow_res) + 1000;
+                        }
+                        
+                        // Sprawdź czy wartości są prawidłowe
+                        if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
+                            processed.push({
+                                time: timestamp,
+                                timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
+                                reserve: available,
+                                required: parseFloat(item.req_pow_res)
+                            });
+                        }
+                    }
+                }
+                console.log(`Generated ${processed.length} data points from historical data`);
+            } else {
+                // Użyj danych przyszłych
+                console.log(`Found ${futureData.length} future data points`);
+                
+                // Najpierw dodaj dane przyszłe
+                futureData.forEach(item => {
+                    if (item.req_pow_res) {
+                        const timestamp = new Date(item.plan_dtime);
+                        
+                        // Oblicz dostępną rezerwę
+                        let available = 0;
+                        if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
+                            available = parseFloat(item.surplus_cap_avail_tso);
+                        } else if (item.avail_cap_gen_units_stor_prov !== null && item.avail_cap_gen_units_stor_prov !== undefined) {
+                            available = parseFloat(item.avail_cap_gen_units_stor_prov);
+                        }
+                        
+                        if (available === 0 || isNaN(available)) {
+                            available = parseFloat(item.req_pow_res) + 1000;
+                        }
+                        
+                        // Sprawdź czy wartości są prawidłowe
+                        if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
+                            processed.push({
+                                time: timestamp,
+                                timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
+                                reserve: available,
+                                required: parseFloat(item.req_pow_res)
+                            });
+                        }
+                    }
+                });
+                
+                // Jeśli mniej niż 72 godziny, dopełnij
+                if (processed.length > 0 && processed.length < 72) {
+                    console.log(`Only ${processed.length} future data points, padding to 72...`);
+                    while (processed.length < 72) {
+                        const lastTimestamp = new Date(processed[processed.length - 1].time);
+                        const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
+                        
+                        processed.push({
+                            time: newTimestamp,
+                            timeStr: newTimestamp.toISOString().replace('T', ' ').slice(0, 19),
+                            reserve: lastData.reserve,
+                            required: lastData.required
+                        });
+                    }
+                    console.log(`Padded to ${processed.length} data points`);
+                }
+            }
             
-            // Przetwórz 72 godziny danych
-            for (let i = 0; i < Math.min(72, dataToUse.length); i++) {
-                const item = dataToUse[i];
-                if (item.plan_dtime && item.req_pow_res) {
-                    let timestamp;
-                    
-                    if (futureData.length === 0) {
-                        // Przesuń dane historyczne
-                        timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
-                    } else {
-                        timestamp = new Date(item.plan_dtime);
-                    }
-                    
-                    // Oblicz dostępną rezerwę
-                    let available = 0;
-                    if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
-                        available = parseFloat(item.surplus_cap_avail_tso);
-                    } else if (item.avail_cap_gen_units_stor_prov !== null && item.avail_cap_gen_units_stor_prov !== undefined) {
-                        available = parseFloat(item.avail_cap_gen_units_stor_prov);
-                    }
-                    
-                    if (available === 0) {
-                        available = parseFloat(item.req_pow_res) + 1000;
-                    }
+            // Jeśli mniej niż 72 godziny, dopełnij ostatnimi wartościami
+            if (processed.length > 0 && processed.length < 72) {
+                console.log(`Only ${processed.length} data points, padding to 72...`);
+                const lastData = processed[processed.length - 1];
+                
+                while (processed.length < 72) {
+                    const lastTimestamp = new Date(processed[processed.length - 1].time);
+                    const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
                     
                     processed.push({
-                        time: timestamp,
-                        timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
-                        reserve: available,
-                        required: parseFloat(item.req_pow_res)
+                        time: newTimestamp,
+                        timeStr: newTimestamp.toISOString().replace('T', ' ').slice(0, 19),
+                        reserve: lastData.reserve,
+                        required: lastData.required
                     });
                 }
             }
             
-            return processed;
+            // Jeśli za dużo danych, ogranicz do 72
+            if (processed.length > 72) {
+                processed = processed.slice(0, 72);
+            }
+            
+            // Jeśli jest cokolwiek, zwróć
+            if (processed.length > 0) {
+                console.log(`Returning ${processed.length} processed data points`);
+                // Sortuj chronologicznie
+                return processed.sort((a, b) => a.time - b.time);
+            } else {
+                console.warn('No valid data points processed');
+                return [];
+            }
         }
         
         // Znajdź alerty
@@ -250,9 +442,64 @@
         
         // Rysuj wykres
         function drawChart(data) {
+            console.log(`Drawing chart with ${data.length} data points`);
             const times = data.map(d => d.timeStr);
             const reserves = data.map(d => d.reserve);
             const required = data.map(d => d.required);
+            
+            // Znajdź unikalne dni
+            const uniqueDates = [...new Set(data.map(d => d.timeStr.substring(0, 10)))];
+            
+            // Pionowe linie na granicach dni
+            const shapes = [];
+            uniqueDates.slice(1).forEach(date => {
+                shapes.push({
+                    type: 'line',
+                    x0: date + ' 00:00:00',
+                    y0: 0,
+                    x1: date + ' 00:00:00',
+                    y1: Math.max(...reserves) * 1.1,
+                    line: {
+                        color: '#95a5a6',
+                        width: 2,
+                        dash: 'dash'
+                    }
+                });
+            });
+            
+            // Znajdź alerty dla linii
+            const alerts = findAlerts(data);
+            
+            // Dodaj linie alertów
+            alerts.orange.forEach(alert => {
+                shapes.push({
+                    type: 'line',
+                    x0: alert.time,
+                    y0: 0,
+                    x1: alert.time,
+                    y1: Math.max(...reserves) * 1.1,
+                    line: {
+                        color: '#f39c12',
+                        width: 2,
+                        dash: 'dot'
+                    }
+                });
+            });
+            
+            alerts.red.forEach(alert => {
+                shapes.push({
+                    type: 'line',
+                    x0: alert.time,
+                    y0: 0,
+                    x1: alert.time,
+                    y1: Math.max(...reserves) * 1.1,
+                    line: {
+                        color: '#e74c3c',
+                        width: 3,
+                        dash: 'dot'
+                    }
+                });
+            });
             
             // Znajdź aktualną godzinę
             const now = new Date();
@@ -300,17 +547,34 @@
                 });
             }
             
+            // Etykiety dat
+            const annotations = uniqueDates.map(date => ({
+                x: date + ' 12:00:00',
+                y: Math.max(...reserves) * 1.05,
+                text: `<b>${date.split('-').reverse().join('.')}</b>`,
+                showarrow: false,
+                font: { size: 14, color: '#2c3e50' }
+            }));
+            
             // Layout
             const layout = {
                 title: {
                     text: 'Prognoza rezerw mocy na następne 72 godziny',
-                    font: { size: 20 }
+                    font: { 
+                        size: window.innerWidth < 768 ? 16 : 20 
+                    }
                 },
+                shapes: shapes,
+                annotations: annotations,
                 xaxis: {
                     title: 'Czas',
                     tickangle: 45,
                     showgrid: true,
-                    gridcolor: '#ecf0f1'
+                    gridcolor: '#ecf0f1',
+                    tickformat: '%H:%M',
+                    tickmode: 'linear',
+                    tick0: times[0],
+                    dtick: 7200000 // co 2 godziny
                 },
                 yaxis: {
                     title: 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
@@ -325,7 +589,14 @@
                     y: -0.15,
                     x: 0.5,
                     xanchor: 'center'
-                }
+                },
+                margin: {
+                    t: 80,
+                    r: window.innerWidth < 768 ? 10 : 20,
+                    b: 80,
+                    l: window.innerWidth < 768 ? 60 : 80
+                },
+                autosize: true
             };
             
             // Rysuj
@@ -376,6 +647,9 @@
             const now = new Date().toLocaleString('pl-PL');
             
             if (data && data.length > 0) {
+                console.log(`Loaded ${data.length} data points`);
+                console.log('Data range:', data[0].timeStr, 'to', data[data.length-1].timeStr);
+                
                 // Rysuj wykres
                 drawChart(data);
                 
@@ -386,11 +660,36 @@
                 
                 // Info bar
                 infoBar.innerHTML = `Źródło: API PSE | Okres: dziś + 2 dni | Ostatnia aktualizacja: ${now}`;
-            } else {
-                infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
-                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br>Sprawdź połączenie internetowe</h2>';
+                } else {
+                    console.warn('No data to display');
+                    // Info bar z czerwonym tłem
+                    infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
+                    infoBar.style.backgroundColor = '#fee';
+                    infoBar.style.borderColor = '#e74c3c';
+                    document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br><br>Sprawdź połączenie internetowe<br>lub spróbuj odświeżyć stronę (F5)<br><br><small>Sprawdź konsolę przeglądarki (F12) dla szczegółów</small></h2>';
+                    
+                    // Pokaż historię alertów mimo braku nowych danych
+                    updateAlertSummary();
+                }
+        }
+        
+        // Test CORS na starcie
+        async function testCORS() {
+            try {
+                const response = await fetch(API_URL + '?$first=1');
+                if (response.ok) {
+                    console.log('✓ CORS is working');
+                } else {
+                    console.error('✗ CORS error - status:', response.status);
+                }
+            } catch (error) {
+                console.error('✗ CORS blocked:', error);
+                console.warn('Uwaga: API PSE może być zablokowane przez CORS. Spróbuj otworzyć stronę w innym przeglądarce.');
             }
         }
+        
+        // Test CORS
+        testCORS();
         
         // Automatyczne odświeżanie co 15 minut
         setInterval(refreshData, 15 * 60 * 1000);
