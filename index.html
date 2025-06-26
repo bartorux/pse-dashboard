@@ -19,7 +19,7 @@
             line-height: 1.4;
         }
         .container {
-            max-width: 1200px;
+            max-width: 1600px; /* Zwiększone z 1200px dla dużych monitorów */
             margin: 0 auto;
             padding: 0 8px;
         }
@@ -195,6 +195,94 @@
                 margin: 20px auto;
                 padding: 10px 20px;
                 font-size: 16px;
+            }
+        }
+        
+        /* Duże monitory (1400px+) */
+        @media (min-width: 1400px) {
+            .container {
+                max-width: 1800px;
+                padding: 0 20px;
+            }
+            .header {
+                padding: 25px;
+            }
+            .header h1 {
+                font-size: 2.2rem;
+            }
+            .header p {
+                font-size: 1.1rem;
+            }
+            #chart {
+                min-height: 450px;
+                margin: 20px auto;
+                padding: 25px;
+            }
+            .alert-summary {
+                margin: 20px auto;
+                padding: 25px;
+                max-height: 500px;
+            }
+            .info-bar {
+                margin: 20px auto;
+                padding: 15px;
+                font-size: 15px;
+            }
+        }
+        
+        /* Bardzo duże monitory (1600px+) */
+        @media (min-width: 1600px) {
+            .container {
+                max-width: 2000px;
+                padding: 0 30px;
+            }
+            .header {
+                padding: 30px;
+            }
+            .header h1 {
+                font-size: 2.5rem;
+            }
+            .header p {
+                font-size: 1.2rem;
+            }
+            #chart {
+                min-height: 550px;
+                margin: 25px auto;
+                padding: 30px;
+            }
+            .alert-summary {
+                margin: 25px auto;
+                padding: 30px;
+                max-height: 600px;
+                font-size: 15px;
+            }
+            .info-bar {
+                margin: 25px auto;
+                padding: 18px;
+                font-size: 16px;
+            }
+            .refresh-btn {
+                margin: 25px auto;
+                padding: 12px 24px;
+                font-size: 18px;
+            }
+        }
+        
+        /* Ultra-wide monitory (2000px+) */
+        @media (min-width: 2000px) {
+            .container {
+                max-width: 2400px;
+                padding: 0 40px;
+            }
+            #chart {
+                min-height: 650px;
+                padding: 40px;
+            }
+            .header h1 {
+                font-size: 3rem;
+            }
+            .header p {
+                font-size: 1.4rem;
             }
         }
     </style>
@@ -532,7 +620,11 @@
             // Znajdź unikalne dni
             const uniqueDates = [...new Set(data.map(d => d.timeStr.substring(0, 10)))];
             
-            // Pionowe linie na granicach dni
+            // Pionowe linie na granicach dni - grubsze na dużych ekranach
+            const separatorWidth = window.innerWidth < 768 ? 1 : 
+                                  window.innerWidth < 1400 ? 2 :
+                                  window.innerWidth < 1600 ? 3 : 4;
+            
             const shapes = [];
             uniqueDates.slice(1).forEach(date => {
                 shapes.push({
@@ -543,14 +635,17 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#95a5a6',
-                        width: 2,
+                        width: separatorWidth,
                         dash: 'dash'
                     }
                 });
             });
             
-            // Znajdź alerty dla linii
+            // Znajdź alerty dla linii - grubsze na dużych ekranach
             const alerts = findAlerts(data);
+            const alertLineWidth = window.innerWidth < 768 ? 2 : 
+                                 window.innerWidth < 1400 ? 3 :
+                                 window.innerWidth < 1600 ? 4 : 5;
             
             // Dodaj linie alertów
             alerts.orange.forEach(alert => {
@@ -562,7 +657,7 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#f39c12',
-                        width: 2,
+                        width: alertLineWidth,
                         dash: 'dot'
                     }
                 });
@@ -577,7 +672,7 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#e74c3c',
-                        width: 3,
+                        width: alertLineWidth + 1,
                         dash: 'dot'
                     }
                 });
@@ -593,7 +688,11 @@
                                  String(currentHour.getDate()).padStart(2, '0') + ' ' +
                                  String(currentHour.getHours()).padStart(2, '0') + ':00:00';
             
-            // Traces
+            // Traces - dostosowane grubości linii do rozmiaru ekranu
+            const lineWidth = window.innerWidth < 768 ? 2 : 
+                            window.innerWidth < 1400 ? 3 :
+                            window.innerWidth < 1600 ? 4 : 5;
+            
             const traces = [
                 {
                     x: times,
@@ -601,7 +700,7 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Rezerwa mocy',
-                    line: { color: '#27ae60', width: 3 }
+                    line: { color: '#27ae60', width: lineWidth }
                 },
                 {
                     x: times,
@@ -609,7 +708,7 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Wymagana rezerwa mocy',
-                    line: { color: '#2c3e50', width: 2 }
+                    line: { color: '#2c3e50', width: lineWidth - 1 }
                 },
                 {
                     x: times,
@@ -617,20 +716,24 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Stała linia (1100 MW)',
-                    line: { color: '#e74c3c', width: 1, dash: 'dash' }
+                    line: { color: '#e74c3c', width: Math.max(1, lineWidth - 2), dash: 'dash' }
                 }
             ];
             
-            // Dodaj czerwoną kropkę dla aktualnej godziny
+            // Dodaj czerwoną kropkę dla aktualnej godziny - większą na dużych ekranach
             const currentIndex = times.indexOf(currentHourStr);
             if (currentIndex !== -1) {
+                const markerSize = window.innerWidth < 768 ? 8 : 
+                                window.innerWidth < 1400 ? 12 :
+                                window.innerWidth < 1600 ? 16 : 20;
+                
                 traces.push({
                     x: [currentHourStr],
                     y: [reserves[currentIndex]],
                     type: 'scatter',
                     mode: 'markers',
                     name: `Aktualna godzina (${currentHour.getHours()}:00)`,
-                    marker: { color: '#e74c3c', size: 12 }
+                    marker: { color: '#e74c3c', size: markerSize }
                 });
             }
             
@@ -642,7 +745,12 @@
                     y: Math.max(...reserves) * 1.05,
                     text: `<b>${date.split('-').reverse().join('.')}</b>`,
                     showarrow: false,
-                    font: { size: window.innerWidth < 768 ? 10 : 12, color: '#2c3e50' }
+                    font: { 
+                        size: window.innerWidth < 768 ? 10 : 
+                              window.innerWidth < 1400 ? 12 :
+                              window.innerWidth < 1600 ? 14 : 16, 
+                        color: '#2c3e50' 
+                    }
                 })));
             }
             
@@ -651,45 +759,92 @@
                 title: {
                     text: window.innerWidth < 480 ? 'Prognoza rezerw mocy (72h)' : 'Prognoza rezerw mocy na następne 72 godziny',
                     font: { 
-                        size: window.innerWidth < 480 ? 12 : window.innerWidth < 768 ? 14 : 18 
+                        size: window.innerWidth < 480 ? 12 : 
+                              window.innerWidth < 768 ? 14 : 
+                              window.innerWidth < 1400 ? 18 :
+                              window.innerWidth < 1600 ? 22 : 26
                     }
                 },
                 shapes: shapes,
                 annotations: annotations,
                 xaxis: {
                     title: window.innerWidth < 480 ? '' : 'Czas',
-                    titlefont: { size: window.innerWidth < 480 ? 10 : 12 },
+                    titlefont: { 
+                        size: window.innerWidth < 480 ? 10 : 
+                              window.innerWidth < 768 ? 12 :
+                              window.innerWidth < 1400 ? 14 :
+                              window.innerWidth < 1600 ? 16 : 18
+                    },
                     tickangle: window.innerWidth < 768 ? -45 : 45,
                     showgrid: true,
                     gridcolor: '#ecf0f1',
                     tickformat: '%H:%M',
                     tickmode: 'linear',
                     tick0: times[0],
-                    dtick: window.innerWidth < 480 ? 21600000 : window.innerWidth < 768 ? 14400000 : 7200000, // 6h/4h/2h
-                    tickfont: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
+                    dtick: window.innerWidth < 480 ? 21600000 : 
+                           window.innerWidth < 768 ? 14400000 : 
+                           window.innerWidth < 1400 ? 7200000 :
+                           3600000, // 6h/4h/2h/1h w zależności od rozmiaru
+                    tickfont: { 
+                        size: window.innerWidth < 480 ? 8 : 
+                              window.innerWidth < 768 ? 9 : 
+                              window.innerWidth < 1400 ? 11 :
+                              window.innerWidth < 1600 ? 13 : 15
+                    }
                 },
                 yaxis: {
-                    title: window.innerWidth < 480 ? 'MW' : window.innerWidth < 768 ? 'Rezerwa mocy [MW]' : 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
-                    titlefont: { size: window.innerWidth < 480 ? 10 : 12 },
+                    title: window.innerWidth < 480 ? 'MW' : 
+                           window.innerWidth < 768 ? 'Rezerwa mocy [MW]' : 
+                           'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
+                    titlefont: { 
+                        size: window.innerWidth < 480 ? 10 : 
+                              window.innerWidth < 768 ? 12 :
+                              window.innerWidth < 1400 ? 14 :
+                              window.innerWidth < 1600 ? 16 : 18
+                    },
                     showgrid: true,
                     gridcolor: '#ecf0f1',
-                    tickfont: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
+                    tickfont: { 
+                        size: window.innerWidth < 480 ? 8 : 
+                              window.innerWidth < 768 ? 9 : 
+                              window.innerWidth < 1400 ? 11 :
+                              window.innerWidth < 1600 ? 13 : 15
+                    }
                 },
                 plot_bgcolor: 'white',
                 paper_bgcolor: 'white',
                 hovermode: 'x unified',
                 legend: {
                     orientation: 'h',
-                    y: window.innerWidth < 480 ? -0.35 : window.innerWidth < 768 ? -0.25 : -0.15,
+                    y: window.innerWidth < 480 ? -0.35 : 
+                       window.innerWidth < 768 ? -0.25 : 
+                       window.innerWidth < 1400 ? -0.15 : -0.12,
                     x: 0.5,
                     xanchor: 'center',
-                    font: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
+                    font: { 
+                        size: window.innerWidth < 480 ? 8 : 
+                              window.innerWidth < 768 ? 9 : 
+                              window.innerWidth < 1400 ? 11 :
+                              window.innerWidth < 1600 ? 13 : 15
+                    }
                 },
                 margin: {
-                    t: window.innerWidth < 480 ? 40 : window.innerWidth < 768 ? 50 : 70,
-                    r: window.innerWidth < 480 ? 3 : window.innerWidth < 768 ? 8 : 15,
-                    b: window.innerWidth < 480 ? 80 : window.innerWidth < 768 ? 70 : 60,
-                    l: window.innerWidth < 480 ? 30 : window.innerWidth < 768 ? 45 : 65
+                    t: window.innerWidth < 480 ? 40 : 
+                       window.innerWidth < 768 ? 50 : 
+                       window.innerWidth < 1400 ? 70 :
+                       window.innerWidth < 1600 ? 80 : 90,
+                    r: window.innerWidth < 480 ? 3 : 
+                       window.innerWidth < 768 ? 8 : 
+                       window.innerWidth < 1400 ? 15 :
+                       window.innerWidth < 1600 ? 20 : 25,
+                    b: window.innerWidth < 480 ? 80 : 
+                       window.innerWidth < 768 ? 70 : 
+                       window.innerWidth < 1400 ? 60 :
+                       window.innerWidth < 1600 ? 70 : 80,
+                    l: window.innerWidth < 480 ? 30 : 
+                       window.innerWidth < 768 ? 45 : 
+                       window.innerWidth < 1400 ? 65 :
+                       window.innerWidth < 1600 ? 75 : 85
                 },
                 autosize: true
             };
@@ -758,7 +913,7 @@
                 const endTime = new Date(data[data.length-1].timeStr);
                 
                 let infoText;
-                } else {
+                if (window.innerWidth < 480) {
                     // Bardzo skrócona wersja na mobile
                     const startFormatted = startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
