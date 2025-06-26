@@ -555,7 +555,7 @@
                 }
             ];
             
-            // Dodaj czerwoną kropkę dla aktualnej godziny
+            // Dodaj szarą kropkę dla aktualnej godziny
             const currentIndex = times.indexOf(currentHourStr);
             if (currentIndex !== -1) {
                 traces.push({
@@ -564,7 +564,7 @@
                     type: 'scatter',
                     mode: 'markers',
                     name: `Aktualna godzina (${currentHour.getHours()}:00)`,
-                    marker: { color: '#c0392b', size: config.markerSize }
+                    marker: { color: '#7f8c8d', size: config.markerSize }
                 });
             }
             
