@@ -60,7 +60,9 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
             padding: 8px;
             min-height: 280px;
-            overflow: hidden;
+            overflow: visible; /* Zmienione z hidden na visible */
+            width: calc(100% - 16px); /* Zapewnienie pełnej szerokości minus marginesy */
+            box-sizing: border-box;
         }
         .alert-summary {
             background: white;
@@ -214,7 +216,7 @@
                 font-size: 1.1rem;
             }
             #chart {
-                min-height: 450px;
+                min-height: 550px; /* Zwiększone z 450px */
                 margin: 20px auto;
                 padding: 25px;
             }
@@ -246,7 +248,7 @@
                 font-size: 1.2rem;
             }
             #chart {
-                min-height: 550px;
+                min-height: 650px; /* Zwiększone z 550px */
                 margin: 25px auto;
                 padding: 30px;
             }
@@ -275,7 +277,7 @@
                 padding: 0 40px;
             }
             #chart {
-                min-height: 650px;
+                min-height: 750px; /* Zwiększone z 650px */
                 padding: 40px;
             }
             .header h1 {
