@@ -12,69 +12,76 @@
         }
         body {
             margin: 0;
-            font-family: Arial, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
             background-color: #f5f5f5;
             min-width: 320px;
+            font-size: 14px;
+            line-height: 1.4;
         }
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 0 8px;
         }
         .header {
             background-color: #2c3e50;
             color: white;
-            padding: 20px;
+            padding: 15px 8px;
             text-align: center;
             border-bottom: 4px solid #2980b9;
         }
         .header h1 {
-            margin: 0 0 10px 0;
-            font-size: clamp(1.3rem, 4vw, 2rem);
+            margin: 0 0 8px 0;
+            font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+            font-weight: 600;
+            line-height: 1.2;
         }
         .header p {
             margin: 0;
             color: #ecf0f1;
-            font-size: clamp(0.9rem, 2vw, 1rem);
+            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            line-height: 1.3;
         }
         .info-bar {
             background-color: #e8f4f8;
-            padding: 12px;
-            margin: 20px auto;
-            border-radius: 8px;
+            padding: 8px 10px;
+            margin: 10px 8px;
+            border-radius: 6px;
             text-align: center;
             border: 1px solid #2980b9;
-            font-size: 13px;
-            max-width: 1200px;
+            font-size: clamp(10px, 2vw, 13px);
             word-wrap: break-word;
+            line-height: 1.3;
         }
         #chart {
-            margin: 20px auto;
+            margin: 10px 8px;
             background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            padding: 20px;
-            min-height: 300px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 8px;
+            min-height: 280px;
+            overflow: hidden;
         }
         .alert-summary {
             background: white;
-            margin: 20px auto;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            max-height: 400px;
+            margin: 10px 8px;
+            padding: 12px;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            max-height: 350px;
             overflow-y: auto;
+            font-size: 13px;
         }
         .refresh-btn {
             display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
+            margin: 15px auto;
+            padding: 8px 16px;
             background-color: #2980b9;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 14px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
         .refresh-btn:hover {
@@ -95,59 +102,99 @@
         }
         @media (max-width: 768px) {
             .container {
-                padding: 0 5px;
+                padding: 0 4px;
             }
             .header {
-                padding: 15px 10px;
+                padding: 12px 6px;
             }
-            .header h1 {
-                font-size: 1.3rem;
-                line-height: 1.2;
-            }
-            .header p {
-                font-size: 0.9rem;
-            }
-            #chart, .alert-summary, .info-bar {
-                margin: 10px 5px;
-                padding: 15px 10px;
-            }
-            #chart {
-                padding: 10px 5px;
-                min-height: 250px;
-            }
-            .refresh-btn {
-                margin: 10px auto;
-                padding: 8px 16px;
-                font-size: 14px;
-            }
-            .info-bar {
-                font-size: 11px;
-                padding: 8px;
-            }
-            .alert-summary {
-                max-height: 300px;
-                font-size: 14px;
-            }
-        }
-        
-        @media (max-width: 480px) {
             .header h1 {
                 font-size: 1.1rem;
+                line-height: 1.1;
             }
             .header p {
                 font-size: 0.8rem;
             }
+            #chart, .alert-summary, .info-bar {
+                margin: 8px 4px;
+                padding: 6px;
+            }
             #chart {
-                min-height: 200px;
-                padding: 5px;
+                min-height: 240px;
+                padding: 4px;
+            }
+            .alert-summary {
+                max-height: 250px;
+                font-size: 12px;
+                padding: 8px;
+            }
+            .refresh-btn {
+                margin: 10px auto;
+                padding: 6px 12px;
+                font-size: 13px;
             }
             .info-bar {
-                font-size: 10px;
-                margin: 10px 2px;
+                font-size: 9px;
+                padding: 6px 8px;
+                margin: 6px 4px;
             }
-            .alert-summary, #chart {
-                margin: 10px 2px;
-                padding: 10px 5px;
+        }
+        
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 2px;
+            }
+            .header {
+                padding: 10px 4px;
+            }
+            .header h1 {
+                font-size: 1rem;
+                margin-bottom: 4px;
+            }
+            .header p {
+                font-size: 0.75rem;
+            }
+            #chart {
+                min-height: 200px;
+                padding: 2px;
+                margin: 6px 2px;
+            }
+            .info-bar {
+                font-size: 8px;
+                margin: 4px 2px;
+                padding: 4px 6px;
+            }
+            .alert-summary {
+                margin: 6px 2px;
+                padding: 6px;
+                max-height: 200px;
+                font-size: 11px;
+            }
+            .refresh-btn {
+                font-size: 12px;
+                padding: 5px 10px;
+                margin: 8px auto;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .container {
+                padding: 0 15px;
+            }
+            .header {
+                padding: 20px;
+            }
+            #chart, .alert-summary, .info-bar {
+                margin: 15px auto;
+                padding: 15px;
+            }
+            #chart {
+                min-height: 350px;
+                padding: 20px;
+            }
+            .refresh-btn {
+                margin: 20px auto;
+                padding: 10px 20px;
+                font-size: 16px;
             }
         }
     </style>
@@ -188,12 +235,12 @@
         // Funkcja do pobierania danych
         async function fetchData() {
             const now = new Date();
-            // ZAWSZE zacznij od aktualnej godziny (nie od 00:00!)
-            const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
-            const startDate = currentHour.toISOString().split('T')[0];
-            const endDate = new Date(currentHour.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            // ZAWSZE zacznij od północy dzisiejszego dnia dla pełnych dób!
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const startDate = startOfToday.toISOString().split('T')[0];
+            const endDate = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             
-            console.log('Fetching data from current hour:', currentHour.toISOString(), 'to:', endDate);
+            console.log('Fetching data from midnight today:', startOfToday.toISOString(), 'to:', endDate);
             
             try {
                 // Próba z filtrem i limitem
@@ -255,8 +302,8 @@
         // Przetwarzanie danych
         function processData(rawData) {
             const now = new Date();
-            // Aktualna godzina - nie pokazuj nic z przeszłości!
-            const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+            // Zacznij od północy dzisiejszego dnia dla pełnych dób!
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             let processed = [];
             
             // Sprawdź czy są dane
@@ -267,24 +314,24 @@
             
             console.log(`Processing ${rawData.length} raw data records`);
             
-            // Szukaj danych które są od aktualnej godziny lub później
+            // Szukaj danych które są od północy dzisiejszego dnia lub później
             const futureData = rawData.filter(item => {
                 if (item.plan_dtime) {
                     const itemDate = new Date(item.plan_dtime);
-                    return itemDate >= currentHour; // Od aktualnej godziny!
+                    return itemDate >= startOfToday; // Od północy dzisiejszego dnia!
                 }
                 return false;
             });
             
-            console.log(`Found ${futureData.length} future data points (from current hour: ${currentHour.toISOString()})`);
+            console.log(`Found ${futureData.length} future data points (from midnight today: ${startOfToday.toISOString()})`);
             
-            // Jeśli nie ma danych przyszłych, użyj historycznych ale zacznij od TERAZ
+            // Jeśli nie ma danych przyszłych, użyj historycznych ale zacznij od północy DZIŚ
             if (futureData.length === 0) {
-                console.log('No future data found, generating from current hour...');
+                console.log('No future data found, generating from midnight today...');
                 
-                // Generuj 72 godziny od AKTUALNEJ GODZINY (nie od 00:00!)
+                // Generuj 72 godziny od PÓŁNOCY DZISIEJSZEGO DNIA
                 for (let i = 0; i < 72; i++) {
-                    const timestamp = new Date(currentHour.getTime() + i * 60 * 60 * 1000);
+                    const timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
                     const dataIndex = i % rawData.length; // Powtarzaj dane jeśli za mało
                     const item = rawData[dataIndex];
                     
@@ -312,12 +359,12 @@
                         }
                     }
                 }
-                console.log(`Generated ${processed.length} data points from current hour`);
+                console.log(`Generated ${processed.length} data points from midnight today`);
             } else {
                 // Użyj danych przyszłych
-                console.log(`Using real future data from current hour`);
+                console.log(`Using real future data from midnight today`);
                 
-                // Dodaj tylko dane od aktualnej godziny
+                // Dodaj tylko dane od północy dzisiejszego dnia
                 futureData.forEach(item => {
                     if (item.req_pow_res) {
                         const timestamp = new Date(item.plan_dtime);
@@ -545,59 +592,62 @@
                 });
             }
             
-            // Etykiety dat
-            const annotations = uniqueDates.map(date => ({
-                x: date + ' 12:00:00',
-                y: Math.max(...reserves) * 1.05,
-                text: `<b>${date.split('-').reverse().join('.')}</b>`,
-                showarrow: false,
-                font: { size: 14, color: '#2c3e50' }
-            }));
+            // Etykiety dat - dopasowane do rozmiaru ekranu
+            const annotations = [];
+            if (window.innerWidth >= 480) {
+                annotations.push(...uniqueDates.map(date => ({
+                    x: date + ' 12:00:00',
+                    y: Math.max(...reserves) * 1.05,
+                    text: `<b>${date.split('-').reverse().join('.')}</b>`,
+                    showarrow: false,
+                    font: { size: window.innerWidth < 768 ? 10 : 12, color: '#2c3e50' }
+                })));
+            }
             
             // Layout
             const layout = {
                 title: {
-                    text: 'Prognoza rezerw mocy na następne 72 godziny',
+                    text: window.innerWidth < 480 ? 'Prognoza rezerw mocy (72h)' : 'Prognoza rezerw mocy na następne 72 godziny',
                     font: { 
-                        size: window.innerWidth < 480 ? 14 : window.innerWidth < 768 ? 16 : 20 
+                        size: window.innerWidth < 480 ? 12 : window.innerWidth < 768 ? 14 : 18 
                     }
                 },
                 shapes: shapes,
                 annotations: annotations,
                 xaxis: {
-                    title: window.innerWidth < 480 ? 'Czas' : 'Czas',
-                    titlefont: { size: window.innerWidth < 480 ? 12 : 14 },
+                    title: window.innerWidth < 480 ? '' : 'Czas',
+                    titlefont: { size: window.innerWidth < 480 ? 10 : 12 },
                     tickangle: window.innerWidth < 768 ? -45 : 45,
                     showgrid: true,
                     gridcolor: '#ecf0f1',
                     tickformat: '%H:%M',
                     tickmode: 'linear',
                     tick0: times[0],
-                    dtick: window.innerWidth < 480 ? 14400000 : 7200000, // 4h na mobile, 2h na desktop
-                    tickfont: { size: window.innerWidth < 480 ? 10 : 12 }
+                    dtick: window.innerWidth < 480 ? 21600000 : window.innerWidth < 768 ? 14400000 : 7200000, // 6h/4h/2h
+                    tickfont: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
                 },
                 yaxis: {
-                    title: window.innerWidth < 480 ? 'MW' : 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
-                    titlefont: { size: window.innerWidth < 480 ? 12 : 14 },
+                    title: window.innerWidth < 480 ? 'MW' : window.innerWidth < 768 ? 'Rezerwa mocy [MW]' : 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
+                    titlefont: { size: window.innerWidth < 480 ? 10 : 12 },
                     showgrid: true,
                     gridcolor: '#ecf0f1',
-                    tickfont: { size: window.innerWidth < 480 ? 10 : 12 }
+                    tickfont: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
                 },
                 plot_bgcolor: 'white',
                 paper_bgcolor: 'white',
                 hovermode: 'x unified',
                 legend: {
                     orientation: 'h',
-                    y: window.innerWidth < 480 ? -0.25 : -0.15,
+                    y: window.innerWidth < 480 ? -0.35 : window.innerWidth < 768 ? -0.25 : -0.15,
                     x: 0.5,
                     xanchor: 'center',
-                    font: { size: window.innerWidth < 480 ? 10 : 12 }
+                    font: { size: window.innerWidth < 480 ? 8 : window.innerWidth < 768 ? 9 : 11 }
                 },
                 margin: {
-                    t: window.innerWidth < 480 ? 60 : 80,
-                    r: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 10 : 20,
-                    b: window.innerWidth < 480 ? 100 : 80,
-                    l: window.innerWidth < 480 ? 50 : window.innerWidth < 768 ? 60 : 80
+                    t: window.innerWidth < 480 ? 40 : window.innerWidth < 768 ? 50 : 70,
+                    r: window.innerWidth < 480 ? 3 : window.innerWidth < 768 ? 8 : 15,
+                    b: window.innerWidth < 480 ? 80 : window.innerWidth < 768 ? 70 : 60,
+                    l: window.innerWidth < 480 ? 30 : window.innerWidth < 768 ? 45 : 65
                 },
                 autosize: true
             };
@@ -661,13 +711,29 @@
                 updateAlertHistory(alerts);
                 updateAlertSummary();
                 
-                // Info bar - pokazuj dokładny zakres danych
+                // Info bar - pokazuj dokładny zakres danych (skrócone na mobile)
                 const startTime = new Date(data[0].timeStr);
                 const endTime = new Date(data[data.length-1].timeStr);
-                const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                 
-                infoBar.innerHTML = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
+                let infoText;
+                if (window.innerWidth < 480) {
+                    // Bardzo skrócona wersja na mobile
+                    const startFormatted = startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
+                    const endFormatted = endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
+                    infoText = `PSE API | ${startFormatted}-${endFormatted} | ${now.split(' ')[1]}`;
+                } else if (window.innerWidth < 768) {
+                    // Skrócona wersja na tablet
+                    const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                    const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                    infoText = `API PSE | ${startFormatted} - ${endFormatted} | Aktualizacja: ${now}`;
+                } else {
+                    // Pełna wersja na desktop
+                    const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                    const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                    infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
+                }
+                
+                infoBar.innerHTML = infoText;
                 infoBar.style.backgroundColor = '#e8f4f8';
                 infoBar.style.borderColor = '#2980b9';
             } else {
