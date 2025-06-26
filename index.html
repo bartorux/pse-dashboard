@@ -973,7 +973,7 @@
                     // Pełna wersja na desktop/large/ultrawide
                     const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                    infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now} | Rozdzielczość: ${scaling.realWidth}x${scaling.realHeight} (${scaling.screenClass})`;
+                    infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
                 }
                 
                 infoBar.innerHTML = infoText;
