@@ -235,12 +235,20 @@
         // Funkcja do pobierania danych
         async function fetchData() {
             const now = new Date();
-            // ZAWSZE zacznij od północy dzisiejszego dnia dla pełnych dób!
+            // ZAWSZE zacznij od północy dzisiejszego dnia w LOKALNEJ strefie czasowej!
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const startDate = startOfToday.toISOString().split('T')[0];
-            const endDate = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             
-            console.log('Fetching data from midnight today:', startOfToday.toISOString(), 'to:', endDate);
+            // Format YYYY-MM-DD w lokalnej strefie czasowej (bez UTC!)
+            const startDate = startOfToday.getFullYear() + '-' + 
+                            String(startOfToday.getMonth() + 1).padStart(2, '0') + '-' + 
+                            String(startOfToday.getDate()).padStart(2, '0');
+            
+            const endOfPeriod = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000);
+            const endDate = endOfPeriod.getFullYear() + '-' + 
+                          String(endOfPeriod.getMonth() + 1).padStart(2, '0') + '-' + 
+                          String(endOfPeriod.getDate()).padStart(2, '0');
+            
+            console.log('Fetching data from midnight today (local):', startDate, '00:00 to:', endDate, '23:59');
             
             try {
                 // Próba z filtrem i limitem
@@ -302,7 +310,7 @@
         // Przetwarzanie danych
         function processData(rawData) {
             const now = new Date();
-            // Zacznij od północy dzisiejszego dnia dla pełnych dób!
+            // Zacznij od północy dzisiejszego dnia w LOKALNEJ strefie czasowej!
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             let processed = [];
             
@@ -313,17 +321,25 @@
             }
             
             console.log(`Processing ${rawData.length} raw data records`);
+            console.log('Start of today (local):', startOfToday.toString());
             
             // Szukaj danych które są od północy dzisiejszego dnia lub później
             const futureData = rawData.filter(item => {
                 if (item.plan_dtime) {
+                    // Parsuj datę z API jako lokalną (nie UTC!)
                     const itemDate = new Date(item.plan_dtime);
+                    
+                    // Loguj pierwszych kilka dla debugowania
+                    if (rawData.indexOf(item) < 3) {
+                        console.log(`Item ${rawData.indexOf(item)}: ${item.plan_dtime} -> ${itemDate.toString()} >= ${startOfToday.toString()}? ${itemDate >= startOfToday}`);
+                    }
+                    
                     return itemDate >= startOfToday; // Od północy dzisiejszego dnia!
                 }
                 return false;
             });
             
-            console.log(`Found ${futureData.length} future data points (from midnight today: ${startOfToday.toISOString()})`);
+            console.log(`Found ${futureData.length} future data points (from midnight today local time)`);
             
             // Jeśli nie ma danych przyszłych, użyj historycznych ale zacznij od północy DZIŚ
             if (futureData.length === 0) {
@@ -350,9 +366,16 @@
                         
                         // Sprawdź czy wartości są prawidłowe
                         if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
+                            // Format daty jako lokalny string (nie ISO!)
+                            const timeStr = timestamp.getFullYear() + '-' + 
+                                          String(timestamp.getMonth() + 1).padStart(2, '0') + '-' + 
+                                          String(timestamp.getDate()).padStart(2, '0') + ' ' +
+                                          String(timestamp.getHours()).padStart(2, '0') + ':' +
+                                          String(timestamp.getMinutes()).padStart(2, '0') + ':00';
+                            
                             processed.push({
                                 time: timestamp,
-                                timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
+                                timeStr: timeStr,
                                 reserve: available,
                                 required: parseFloat(item.req_pow_res)
                             });
@@ -383,9 +406,16 @@
                         
                         // Sprawdź czy wartości są prawidłowe
                         if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
+                            // Format daty jako lokalny string (nie ISO!)
+                            const timeStr = timestamp.getFullYear() + '-' + 
+                                          String(timestamp.getMonth() + 1).padStart(2, '0') + '-' + 
+                                          String(timestamp.getDate()).padStart(2, '0') + ' ' +
+                                          String(timestamp.getHours()).padStart(2, '0') + ':' +
+                                          String(timestamp.getMinutes()).padStart(2, '0') + ':00';
+                            
                             processed.push({
                                 time: timestamp,
-                                timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
+                                timeStr: timeStr,
                                 reserve: available,
                                 required: parseFloat(item.req_pow_res)
                             });
@@ -403,9 +433,16 @@
                         const lastTimestamp = new Date(processed[processed.length - 1].time);
                         const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
                         
+                        // Format daty jako lokalny string (nie ISO!)
+                        const timeStr = newTimestamp.getFullYear() + '-' + 
+                                      String(newTimestamp.getMonth() + 1).padStart(2, '0') + '-' + 
+                                      String(newTimestamp.getDate()).padStart(2, '0') + ' ' +
+                                      String(newTimestamp.getHours()).padStart(2, '0') + ':' +
+                                      String(newTimestamp.getMinutes()).padStart(2, '0') + ':00';
+                        
                         processed.push({
                             time: newTimestamp,
-                            timeStr: newTimestamp.toISOString().replace('T', ' ').slice(0, 19),
+                            timeStr: timeStr,
                             reserve: lastData.reserve,
                             required: lastData.required
                         });
@@ -549,7 +586,12 @@
             // Znajdź aktualną godzinę
             const now = new Date();
             const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
-            const currentHourStr = currentHour.toISOString().replace('T', ' ').slice(0, 19);
+            
+            // Format daty jako lokalny string (nie ISO!)
+            const currentHourStr = currentHour.getFullYear() + '-' + 
+                                 String(currentHour.getMonth() + 1).padStart(2, '0') + '-' + 
+                                 String(currentHour.getDate()).padStart(2, '0') + ' ' +
+                                 String(currentHour.getHours()).padStart(2, '0') + ':00:00';
             
             // Traces
             const traces = [
@@ -716,11 +758,12 @@
                 const endTime = new Date(data[data.length-1].timeStr);
                 
                 let infoText;
-                if (window.innerWidth < 480) {
+                } else {
                     // Bardzo skrócona wersja na mobile
                     const startFormatted = startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
-                    infoText = `PSE API | ${startFormatted}-${endFormatted} | ${now.split(' ')[1]}`;
+                    const timeFormatted = now.split(' ')[1].substring(0,5); // HH:MM
+                    infoText = `PSE API | ${startFormatted}-${endFormatted} | ${timeFormatted}`;
                 } else if (window.innerWidth < 768) {
                     // Skrócona wersja na tablet
                     const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
