@@ -100,12 +100,54 @@
             .header {
                 padding: 15px 10px;
             }
+            .header h1 {
+                font-size: 1.3rem;
+                line-height: 1.2;
+            }
+            .header p {
+                font-size: 0.9rem;
+            }
             #chart, .alert-summary, .info-bar {
                 margin: 10px 5px;
                 padding: 15px 10px;
             }
+            #chart {
+                padding: 10px 5px;
+                min-height: 250px;
+            }
             .refresh-btn {
                 margin: 10px auto;
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+            .info-bar {
+                font-size: 11px;
+                padding: 8px;
+            }
+            .alert-summary {
+                max-height: 300px;
+                font-size: 14px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.1rem;
+            }
+            .header p {
+                font-size: 0.8rem;
+            }
+            #chart {
+                min-height: 200px;
+                padding: 5px;
+            }
+            .info-bar {
+                font-size: 10px;
+                margin: 10px 2px;
+            }
+            .alert-summary, #chart {
+                margin: 10px 2px;
+                padding: 10px 5px;
             }
         }
     </style>
@@ -146,11 +188,12 @@
         // Funkcja do pobierania danych
         async function fetchData() {
             const now = new Date();
-            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const startDate = startOfToday.toISOString().split('T')[0];
-            const endDate = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            // ZAWSZE zacznij od aktualnej godziny (nie od 00:00!)
+            const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+            const startDate = currentHour.toISOString().split('T')[0];
+            const endDate = new Date(currentHour.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
             
-            console.log('Fetching data from:', startDate, 'to:', endDate);
+            console.log('Fetching data from current hour:', currentHour.toISOString(), 'to:', endDate);
             
             try {
                 // Próba z filtrem i limitem
@@ -212,7 +255,8 @@
         // Przetwarzanie danych
         function processData(rawData) {
             const now = new Date();
-            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            // Aktualna godzina - nie pokazuj nic z przeszłości!
+            const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
             let processed = [];
             
             // Sprawdź czy są dane
@@ -223,23 +267,24 @@
             
             console.log(`Processing ${rawData.length} raw data records`);
             
-            // Szukaj danych przyszłych
+            // Szukaj danych które są od aktualnej godziny lub później
             const futureData = rawData.filter(item => {
                 if (item.plan_dtime) {
                     const itemDate = new Date(item.plan_dtime);
-                    return itemDate >= startOfToday;
+                    return itemDate >= currentHour; // Od aktualnej godziny!
                 }
                 return false;
             });
             
-            // Jeśli nie ma danych przyszłych, użyj historycznych i przesuń je
+            console.log(`Found ${futureData.length} future data points (from current hour: ${currentHour.toISOString()})`);
+            
+            // Jeśli nie ma danych przyszłych, użyj historycznych ale zacznij od TERAZ
             if (futureData.length === 0) {
-                console.log('No future data found, shifting historical data...');
-                console.log(`Will generate ${Math.min(72, rawData.length)} hours from historical data`);
+                console.log('No future data found, generating from current hour...');
                 
-                // Generuj 72 godziny od dziś 00:00
+                // Generuj 72 godziny od AKTUALNEJ GODZINY (nie od 00:00!)
                 for (let i = 0; i < 72; i++) {
-                    const timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
+                    const timestamp = new Date(currentHour.getTime() + i * 60 * 60 * 1000);
                     const dataIndex = i % rawData.length; // Powtarzaj dane jeśli za mało
                     const item = rawData[dataIndex];
                     
@@ -267,12 +312,12 @@
                         }
                     }
                 }
-                console.log(`Generated ${processed.length} data points from historical data`);
+                console.log(`Generated ${processed.length} data points from current hour`);
             } else {
                 // Użyj danych przyszłych
-                console.log(`Found ${futureData.length} future data points`);
+                console.log(`Using real future data from current hour`);
                 
-                // Najpierw dodaj dane przyszłe
+                // Dodaj tylko dane od aktualnej godziny
                 futureData.forEach(item => {
                     if (item.req_pow_res) {
                         const timestamp = new Date(item.plan_dtime);
@@ -301,12 +346,13 @@
                     }
                 });
                 
-                // Jeśli mniej niż 72 godziny, dopełnij
+                // Jeśli mniej niż 72 godziny, dopełnij OD OSTATNIEGO PUNKTU
                 if (processed.length > 0 && processed.length < 72) {
                     console.log(`Only ${processed.length} future data points, padding to 72...`);
                     const lastData = processed[processed.length - 1];
+                    const startPaddingFrom = processed.length;
                     
-                    while (processed.length < 72) {
+                    for (let i = startPaddingFrom; i < 72; i++) {
                         const lastTimestamp = new Date(processed[processed.length - 1].time);
                         const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
                         
@@ -513,40 +559,45 @@
                 title: {
                     text: 'Prognoza rezerw mocy na następne 72 godziny',
                     font: { 
-                        size: window.innerWidth < 768 ? 16 : 20 
+                        size: window.innerWidth < 480 ? 14 : window.innerWidth < 768 ? 16 : 20 
                     }
                 },
                 shapes: shapes,
                 annotations: annotations,
                 xaxis: {
-                    title: 'Czas',
-                    tickangle: 45,
+                    title: window.innerWidth < 480 ? 'Czas' : 'Czas',
+                    titlefont: { size: window.innerWidth < 480 ? 12 : 14 },
+                    tickangle: window.innerWidth < 768 ? -45 : 45,
                     showgrid: true,
                     gridcolor: '#ecf0f1',
                     tickformat: '%H:%M',
                     tickmode: 'linear',
                     tick0: times[0],
-                    dtick: 7200000 // co 2 godziny
+                    dtick: window.innerWidth < 480 ? 14400000 : 7200000, // 4h na mobile, 2h na desktop
+                    tickfont: { size: window.innerWidth < 480 ? 10 : 12 }
                 },
                 yaxis: {
-                    title: 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
+                    title: window.innerWidth < 480 ? 'MW' : 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
+                    titlefont: { size: window.innerWidth < 480 ? 12 : 14 },
                     showgrid: true,
-                    gridcolor: '#ecf0f1'
+                    gridcolor: '#ecf0f1',
+                    tickfont: { size: window.innerWidth < 480 ? 10 : 12 }
                 },
                 plot_bgcolor: 'white',
                 paper_bgcolor: 'white',
                 hovermode: 'x unified',
                 legend: {
                     orientation: 'h',
-                    y: -0.15,
+                    y: window.innerWidth < 480 ? -0.25 : -0.15,
                     x: 0.5,
-                    xanchor: 'center'
+                    xanchor: 'center',
+                    font: { size: window.innerWidth < 480 ? 10 : 12 }
                 },
                 margin: {
-                    t: 80,
-                    r: window.innerWidth < 768 ? 10 : 20,
-                    b: 80,
-                    l: window.innerWidth < 768 ? 60 : 80
+                    t: window.innerWidth < 480 ? 60 : 80,
+                    r: window.innerWidth < 480 ? 5 : window.innerWidth < 768 ? 10 : 20,
+                    b: window.innerWidth < 480 ? 100 : 80,
+                    l: window.innerWidth < 480 ? 50 : window.innerWidth < 768 ? 60 : 80
                 },
                 autosize: true
             };
@@ -610,8 +661,15 @@
                 updateAlertHistory(alerts);
                 updateAlertSummary();
                 
-                // Info bar
-                infoBar.innerHTML = `Źródło: API PSE | Okres: dziś + 2 dni | Ostatnia aktualizacja: ${now}`;
+                // Info bar - pokazuj dokładny zakres danych
+                const startTime = new Date(data[0].timeStr);
+                const endTime = new Date(data[data.length-1].timeStr);
+                const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                
+                infoBar.innerHTML = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
+                infoBar.style.backgroundColor = '#e8f4f8';
+                infoBar.style.borderColor = '#2980b9';
             } else {
                 console.warn('No data to display');
                 // Info bar z czerwonym tłem
