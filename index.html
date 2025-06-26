@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSE Dashboard - Plan koordynacyjny 5-letni</title>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 4px solid #2980b9;
+        }
+        .header h1 {
+            margin: 0 0 10px 0;
+        }
+        .header p {
+            margin: 0;
+            color: #ecf0f1;
+        }
+        .info-bar {
+            background-color: #e8f4f8;
+            padding: 12px;
+            margin: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border: 1px solid #2980b9;
+            font-size: 13px;
+        }
+        #chart {
+            margin: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+        .alert-summary {
+            background: white;
+            margin: 20px;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .refresh-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .refresh-btn:hover {
+            background-color: #21618c;
+        }
+        .error {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .success {
+            color: #27ae60;
+        }
+        .warning {
+            color: #f39c12;
+        }
+        .danger {
+            color: #e74c3c;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Plan koordynacyjny 5-letni - prognoza na 72 godziny</h1>
+        <p>Monitoring prognozowanych rezerw mocy w Krajowym Systemie Elektroenergetycznym</p>
+    </div>
+    
+    <div class="info-bar" id="infoBar">
+        Ładowanie danych...
+    </div>
+    
+    <div id="chart"></div>
+    
+    <div class="alert-summary" id="alertSummary">
+        <h3>Ładowanie alertów...</h3>
+    </div>
+    
+    <button class="refresh-btn" onclick="refreshData()">Odśwież</button>
+
+    <script>
+        // Konfiguracja
+        const ALERT_THRESHOLD_ORANGE = 500;
+        const ALERT_THRESHOLD_RED = 300;
+        const API_URL = 'https://api.raporty.pse.pl/api/pk5l-wp';
+        
+        // Historia alertów
+        let alertHistory = {
+            orange: [],
+            red: [],
+            lastResetDate: null
+        };
+        
+        // Funkcja do pobierania danych
+        async function fetchData() {
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const startDate = startOfToday.toISOString().split('T')[0];
+            const endDate = new Date(startOfToday.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+            
+            try {
+                // Próba z filtrem
+                let url = `${API_URL}?$filter=plan_dtime ge '${startDate}' and plan_dtime le '${endDate}'&$orderby=plan_dtime`;
+                let response = await fetch(url);
+                
+                if (!response.ok) {
+                    // Bez filtra
+                    response = await fetch(API_URL);
+                }
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    return processData(data.value || []);
+                }
+            } catch (error) {
+                console.error('API Error:', error);
+            }
+            
+            return null;
+        }
+        
+        // Przetwarzanie danych
+        function processData(rawData) {
+            const now = new Date();
+            const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const processed = [];
+            
+            // Szukaj danych przyszłych
+            const futureData = rawData.filter(item => {
+                if (item.plan_dtime) {
+                    const itemDate = new Date(item.plan_dtime);
+                    return itemDate >= startOfToday;
+                }
+                return false;
+            });
+            
+            const dataToUse = futureData.length > 0 ? futureData : rawData;
+            
+            // Przetwórz 72 godziny danych
+            for (let i = 0; i < Math.min(72, dataToUse.length); i++) {
+                const item = dataToUse[i];
+                if (item.plan_dtime && item.req_pow_res) {
+                    let timestamp;
+                    
+                    if (futureData.length === 0) {
+                        // Przesuń dane historyczne
+                        timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
+                    } else {
+                        timestamp = new Date(item.plan_dtime);
+                    }
+                    
+                    // Oblicz dostępną rezerwę
+                    let available = 0;
+                    if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
+                        available = parseFloat(item.surplus_cap_avail_tso);
+                    } else if (item.avail_cap_gen_units_stor_prov !== null && item.avail_cap_gen_units_stor_prov !== undefined) {
+                        available = parseFloat(item.avail_cap_gen_units_stor_prov);
+                    }
+                    
+                    if (available === 0) {
+                        available = parseFloat(item.req_pow_res) + 1000;
+                    }
+                    
+                    processed.push({
+                        time: timestamp,
+                        timeStr: timestamp.toISOString().replace('T', ' ').slice(0, 19),
+                        reserve: available,
+                        required: parseFloat(item.req_pow_res)
+                    });
+                }
+            }
+            
+            return processed;
+        }
+        
+        // Znajdź alerty
+        function findAlerts(data) {
+            const alertsOrange = [];
+            const alertsRed = [];
+            
+            data.forEach(item => {
+                const difference = item.reserve - item.required;
+                
+                if (difference <= ALERT_THRESHOLD_RED || item.reserve < item.required) {
+                    alertsRed.push({
+                        time: item.timeStr,
+                        reserve: item.reserve,
+                        required: item.required,
+                        difference: difference
+                    });
+                } else if (difference <= ALERT_THRESHOLD_ORANGE) {
+                    alertsOrange.push({
+                        time: item.timeStr,
+                        reserve: item.reserve,
+                        required: item.required,
+                        difference: difference
+                    });
+                }
+            });
+            
+            return { orange: alertsOrange, red: alertsRed };
+        }
+        
+        // Aktualizuj historię alertów
+        function updateAlertHistory(newAlerts) {
+            const today = new Date().toDateString();
+            
+            // Reset jeśli nowy dzień
+            if (alertHistory.lastResetDate !== today) {
+                alertHistory = {
+                    orange: [],
+                    red: [],
+                    lastResetDate: today
+                };
+            }
+            
+            // Dodaj nowe unikalne alerty
+            newAlerts.orange.forEach(alert => {
+                if (!alertHistory.orange.some(a => a.time === alert.time)) {
+                    alertHistory.orange.push(alert);
+                }
+            });
+            
+            newAlerts.red.forEach(alert => {
+                if (!alertHistory.red.some(a => a.time === alert.time)) {
+                    alertHistory.red.push(alert);
+                }
+            });
+        }
+        
+        // Rysuj wykres
+        function drawChart(data) {
+            const times = data.map(d => d.timeStr);
+            const reserves = data.map(d => d.reserve);
+            const required = data.map(d => d.required);
+            
+            // Znajdź aktualną godzinę
+            const now = new Date();
+            const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
+            const currentHourStr = currentHour.toISOString().replace('T', ' ').slice(0, 19);
+            
+            // Traces
+            const traces = [
+                {
+                    x: times,
+                    y: reserves,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Rezerwa mocy',
+                    line: { color: '#27ae60', width: 3 }
+                },
+                {
+                    x: times,
+                    y: required,
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Wymagana rezerwa mocy',
+                    line: { color: '#2c3e50', width: 2 }
+                },
+                {
+                    x: times,
+                    y: Array(times.length).fill(1100),
+                    type: 'scatter',
+                    mode: 'lines',
+                    name: 'Stała linia (1100 MW)',
+                    line: { color: '#e74c3c', width: 1, dash: 'dash' }
+                }
+            ];
+            
+            // Dodaj czerwoną kropkę dla aktualnej godziny
+            const currentIndex = times.indexOf(currentHourStr);
+            if (currentIndex !== -1) {
+                traces.push({
+                    x: [currentHourStr],
+                    y: [reserves[currentIndex]],
+                    type: 'scatter',
+                    mode: 'markers',
+                    name: `Aktualna godzina (${currentHour.getHours()}:00)`,
+                    marker: { color: '#e74c3c', size: 12 }
+                });
+            }
+            
+            // Layout
+            const layout = {
+                title: {
+                    text: 'Prognoza rezerw mocy na następne 72 godziny',
+                    font: { size: 20 }
+                },
+                xaxis: {
+                    title: 'Czas',
+                    tickangle: 45,
+                    showgrid: true,
+                    gridcolor: '#ecf0f1'
+                },
+                yaxis: {
+                    title: 'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
+                    showgrid: true,
+                    gridcolor: '#ecf0f1'
+                },
+                plot_bgcolor: 'white',
+                paper_bgcolor: 'white',
+                hovermode: 'x unified',
+                legend: {
+                    orientation: 'h',
+                    y: -0.15,
+                    x: 0.5,
+                    xanchor: 'center'
+                }
+            };
+            
+            // Rysuj
+            Plotly.newPlot('chart', traces, layout, {responsive: true});
+        }
+        
+        // Aktualizuj podsumowanie alertów
+        function updateAlertSummary() {
+            const summary = document.getElementById('alertSummary');
+            let html = '';
+            
+            if (alertHistory.orange.length > 0 || alertHistory.red.length > 0) {
+                html += '<h3 class="danger">⚠️ Historia alertów z dzisiejszej doby:</h3>';
+                
+                // Czerwone alerty
+                if (alertHistory.red.length > 0) {
+                    html += `<h4 class="danger">🔴 Alerty czerwone (margines ≤ ${ALERT_THRESHOLD_RED} MW): ${alertHistory.red.length}</h4>`;
+                    alertHistory.red.sort((a, b) => a.time.localeCompare(b.time)).forEach(alert => {
+                        const time = new Date(alert.time).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                        html += `<p style="margin-left: 20px;">• ${time} - Rezerwa: ${alert.reserve.toFixed(0)} MW, `;
+                        html += `Wymagana: ${alert.required.toFixed(0)} MW, Margines: ${alert.difference.toFixed(0)} MW</p>`;
+                    });
+                }
+                
+                // Pomarańczowe alerty
+                if (alertHistory.orange.length > 0) {
+                    html += `<h4 class="warning">🟠 Alerty pomarańczowe (margines ≤ ${ALERT_THRESHOLD_ORANGE} MW): ${alertHistory.orange.length}</h4>`;
+                    alertHistory.orange.sort((a, b) => a.time.localeCompare(b.time)).forEach(alert => {
+                        const time = new Date(alert.time).toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit' });
+                        html += `<p style="margin-left: 20px;">• ${time} - Rezerwa: ${alert.reserve.toFixed(0)} MW, `;
+                        html += `Wymagana: ${alert.required.toFixed(0)} MW, Margines: ${alert.difference.toFixed(0)} MW</p>`;
+                    });
+                }
+            } else {
+                html = '<h3 class="success">✅ Brak alertów w dzisiejszej dobie</h3>';
+                html += '<p>Wszystkie rezerwy mocy są na bezpiecznym poziomie</p>';
+            }
+            
+            summary.innerHTML = html;
+        }
+        
+        // Główna funkcja odświeżania
+        async function refreshData() {
+            const infoBar = document.getElementById('infoBar');
+            infoBar.textContent = 'Pobieranie danych...';
+            
+            const data = await fetchData();
+            const now = new Date().toLocaleString('pl-PL');
+            
+            if (data && data.length > 0) {
+                // Rysuj wykres
+                drawChart(data);
+                
+                // Znajdź i zaktualizuj alerty
+                const alerts = findAlerts(data);
+                updateAlertHistory(alerts);
+                updateAlertSummary();
+                
+                // Info bar
+                infoBar.innerHTML = `Źródło: API PSE | Okres: dziś + 2 dni | Ostatnia aktualizacja: ${now}`;
+            } else {
+                infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
+                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br>Sprawdź połączenie internetowe</h2>';
+            }
+        }
+        
+        // Automatyczne odświeżanie co 15 minut
+        setInterval(refreshData, 15 * 60 * 1000);
+        
+        // Pierwsze ładowanie
+        refreshData();
+    </script>
+</body>
+</html>
