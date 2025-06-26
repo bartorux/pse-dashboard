@@ -320,6 +320,50 @@
             lastResetDate: null
         };
         
+        // Funkcja do inteligentnego wykrywania rozdzielczości i skalowania
+        function getSmartScaling() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+            const pixelRatio = window.devicePixelRatio || 1;
+            const realWidth = width * pixelRatio;
+            const realHeight = height * pixelRatio;
+            
+            console.log(`Screen: ${width}x${height} (${realWidth}x${realHeight} real, ratio: ${pixelRatio})`);
+            
+            // Klasyfikacja ekranu
+            let screenClass;
+            if (width < 480) {
+                screenClass = 'mobile';
+            } else if (width < 768) {
+                screenClass = 'tablet';
+            } else if (width < 1200) {
+                screenClass = 'laptop';
+            } else if (width < 1600) {
+                screenClass = 'desktop';
+            } else if (width < 2000) {
+                screenClass = 'large';
+            } else {
+                screenClass = 'ultrawide';
+            }
+            
+            // Dodatkowe wykrywanie wysokiej rozdzielczości (Retina itp.)
+            const isHighDPI = pixelRatio > 1.5;
+            const isUltraHigh = realWidth > 3000 || realHeight > 1600;
+            
+            return {
+                width,
+                height,
+                pixelRatio,
+                realWidth,
+                realHeight,
+                screenClass,
+                isHighDPI,
+                isUltraHigh,
+                // Skala bazowa od 0.8 do 2.0
+                scale: Math.min(2.0, Math.max(0.8, (realWidth / 1920) * (isHighDPI ? 1.2 : 1.0)))
+            };
+        }
+        
         // Funkcja do pobierania danych
         async function fetchData() {
             const now = new Date();
@@ -908,27 +952,28 @@
                 updateAlertHistory(alerts);
                 updateAlertSummary();
                 
-                // Info bar - pokazuj dokładny zakres danych (skrócone na mobile)
+                // Info bar - pokazuj dokładny zakres danych (używa inteligentnego skalowania)
                 const startTime = new Date(data[0].timeStr);
                 const endTime = new Date(data[data.length-1].timeStr);
+                const scaling = getSmartScaling();
                 
                 let infoText;
-                if (window.innerWidth < 480) {
+                if (scaling.screenClass === 'mobile') {
                     // Bardzo skrócona wersja na mobile
                     const startFormatted = startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
                     const timeFormatted = now.split(' ')[1].substring(0,5); // HH:MM
                     infoText = `PSE API | ${startFormatted}-${endFormatted} | ${timeFormatted}`;
-                } else if (window.innerWidth < 768) {
+                } else if (scaling.screenClass === 'tablet') {
                     // Skrócona wersja na tablet
                     const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                     infoText = `API PSE | ${startFormatted} - ${endFormatted} | Aktualizacja: ${now}`;
                 } else {
-                    // Pełna wersja na desktop
+                    // Pełna wersja na desktop/large/ultrawide
                     const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                     const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                    infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
+                    infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now} | Rozdzielczość: ${scaling.realWidth}x${scaling.realHeight} (${scaling.screenClass})`;
                 }
                 
                 infoBar.innerHTML = infoText;
@@ -967,6 +1012,32 @@
         
         // Automatyczne odświeżanie co 15 minut
         setInterval(refreshData, 15 * 60 * 1000);
+        
+        // Ponowne rysowanie przy zmianie rozmiaru okna (z throttling)
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                const chart = document.getElementById('chart');
+                if (chart && chart.data) {
+                    console.log('Window resized, redrawing chart with smart scaling...');
+                    // Jeśli mamy dane, przerysuj wykres
+                    const currentData = chart.data;
+                    if (currentData && currentData.length > 0) {
+                        // Symuluj dane w odpowiednim formacie
+                        const simulatedData = [];
+                        for (let i = 0; i < currentData[0].x.length; i++) {
+                            simulatedData.push({
+                                timeStr: currentData[0].x[i],
+                                reserve: currentData[0].y[i],
+                                required: currentData[1] ? currentData[1].y[i] : 0
+                            });
+                        }
+                        drawChart(simulatedData);
+                    }
+                }
+            }, 300); // Throttle na 300ms
+        });
         
         // Pierwsze ładowanie
         refreshData();
