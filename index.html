@@ -19,65 +19,69 @@
             line-height: 1.4;
         }
         .container {
-            max-width: 1600px; /* Zwiększone z 1200px dla dużych monitorów */
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 0 8px;
+            padding: 0 10px;
         }
         .header {
             background-color: #2c3e50;
             color: white;
-            padding: 15px 8px;
+            padding: 20px 10px;
             text-align: center;
             border-bottom: 4px solid #2980b9;
         }
         .header h1 {
-            margin: 0 0 8px 0;
-            font-size: clamp(1.1rem, 3.5vw, 1.8rem);
+            margin: 0 0 10px 0;
+            font-size: clamp(1.2rem, 4vw, 2rem);
             font-weight: 600;
             line-height: 1.2;
         }
         .header p {
             margin: 0;
             color: #ecf0f1;
-            font-size: clamp(0.8rem, 2vw, 0.95rem);
+            font-size: clamp(0.8rem, 2.5vw, 1rem);
             line-height: 1.3;
         }
         .info-bar {
             background-color: #e8f4f8;
-            padding: 8px 10px;
-            margin: 10px 8px;
+            padding: 10px;
+            margin: 15px 0;
             border-radius: 6px;
             text-align: center;
             border: 1px solid #2980b9;
-            font-size: clamp(10px, 2vw, 13px);
+            font-size: clamp(11px, 2.5vw, 14px);
             word-wrap: break-word;
             line-height: 1.3;
         }
-        #chart {
-            margin: 10px 8px 20px 8px;
+        .chart-container {
             background: white;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            padding: 5px 20px 30px 10px; /* Zmniejszony padding prawy */
-            min-height: 280px;
-            overflow: hidden; /* Powrót do hidden */
-            width: calc(100% - 16px);
-            box-sizing: border-box;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 15px 0;
+            padding: 10px;
+            width: 100%;
+            position: relative;
+        }
+        #chart {
+            width: 100%;
+            height: 70vh;
+            min-height: 400px;
+            max-height: 800px;
         }
         .alert-summary {
             background: white;
-            margin: 10px 8px;
-            padding: 12px;
+            margin: 15px 0;
+            padding: 15px;
             border-radius: 6px;
             box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            max-height: 350px;
+            max-height: 400px;
             overflow-y: auto;
             font-size: 13px;
         }
         .refresh-btn {
             display: block;
-            margin: 15px auto;
-            padding: 8px 16px;
+            margin: 20px auto;
+            padding: 10px 20px;
             background-color: #2980b9;
             color: white;
             border: none;
@@ -85,209 +89,42 @@
             cursor: pointer;
             font-size: 14px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: background-color 0.3s;
         }
         .refresh-btn:hover {
             background-color: #21618c;
         }
-        .error {
-            color: #e74c3c;
-            font-weight: bold;
-        }
-        .success {
-            color: #27ae60;
-        }
-        .warning {
-            color: #f39c12;
-        }
-        .danger {
-            color: #e74c3c;
-        }
-        @media (max-width: 768px) {
-            .container {
-                padding: 0 4px;
-            }
-            .header {
-                padding: 12px 6px;
-            }
-            .header h1 {
-                font-size: 1.1rem;
-                line-height: 1.1;
-            }
-            .header p {
-                font-size: 0.8rem;
-            }
-            #chart, .alert-summary, .info-bar {
-                margin: 8px 4px;
-                padding: 6px;
-            }
-            #chart {
-                min-height: 240px;
-                padding: 4px;
-            }
-            .alert-summary {
-                max-height: 250px;
-                font-size: 12px;
-                padding: 8px;
-            }
-            .refresh-btn {
-                margin: 10px auto;
-                padding: 6px 12px;
-                font-size: 13px;
-            }
-            .info-bar {
-                font-size: 9px;
-                padding: 6px 8px;
-                margin: 6px 4px;
-            }
-        }
-        
+        .error { color: #e74c3c; font-weight: bold; }
+        .success { color: #27ae60; }
+        .warning { color: #f39c12; }
+        .danger { color: #e74c3c; }
+
+        /* Responsive breakpoints */
         @media (max-width: 480px) {
-            .container {
-                padding: 0 2px;
-            }
-            .header {
-                padding: 10px 4px;
-            }
-            .header h1 {
-                font-size: 1rem;
-                margin-bottom: 4px;
-            }
-            .header p {
-                font-size: 0.75rem;
-            }
-            #chart {
-                min-height: 200px;
-                padding: 2px;
-                margin: 6px 2px;
-            }
-            .info-bar {
-                font-size: 8px;
-                margin: 4px 2px;
-                padding: 4px 6px;
-            }
-            .alert-summary {
-                margin: 6px 2px;
-                padding: 6px;
-                max-height: 200px;
-                font-size: 11px;
-            }
-            .refresh-btn {
-                font-size: 12px;
-                padding: 5px 10px;
-                margin: 8px auto;
-            }
+            .container { padding: 0 5px; }
+            .header { padding: 15px 5px; }
+            .info-bar, .alert-summary { margin: 10px 0; padding: 10px; }
+            .chart-container { margin: 10px 0; padding: 5px; }
+            #chart { height: 60vh; min-height: 300px; }
+            .refresh-btn { padding: 8px 16px; font-size: 13px; }
         }
         
-        @media (min-width: 769px) {
-            .container {
-                padding: 0 15px;
-            }
-            .header {
-                padding: 20px;
-            }
-            #chart, .alert-summary, .info-bar {
-                margin: 15px auto;
-                padding: 20px;
-            }
-            #chart {
-                min-height: 500px;
-                margin-bottom: 25px;
-                padding: 10px 40px 40px 20px; /* Umiarkowany padding prawy */
-            }
-            .refresh-btn {
-                margin: 20px auto;
-                padding: 10px 20px;
-                font-size: 16px;
-            }
+        @media (min-width: 481px) and (max-width: 768px) {
+            .container { padding: 0 8px; }
+            .header { padding: 18px 8px; }
+            #chart { height: 65vh; min-height: 350px; }
         }
         
-        /* Duże monitory (1400px+) */
-        @media (min-width: 1400px) {
-            .container {
-                max-width: 1800px;
-                padding: 0 20px;
-            }
-            .header {
-                padding: 25px;
-            }
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            .header p {
-                font-size: 1.1rem;
-            }
-            #chart {
-                min-height: 650px;
-                margin: 20px auto 30px auto;
-                padding: 15px 60px 50px 30px; /* Zwiększony ale rozsądny padding */
-            }
-            .alert-summary {
-                margin: 20px auto;
-                padding: 25px;
-                max-height: 500px;
-            }
-            .info-bar {
-                margin: 20px auto;
-                padding: 15px;
-                font-size: 15px;
-            }
+        @media (min-width: 769px) and (max-width: 1200px) {
+            .container { padding: 0 12px; }
+            .header { padding: 22px 12px; }
+            #chart { height: 70vh; min-height: 450px; }
         }
         
-        /* Bardzo duże monitory (1600px+) */
-        @media (min-width: 1600px) {
-            .container {
-                max-width: 2000px;
-                padding: 0 30px;
-            }
-            .header {
-                padding: 30px;
-            }
-            .header h1 {
-                font-size: 2.5rem;
-            }
-            .header p {
-                font-size: 1.2rem;
-            }
-            #chart {
-                min-height: 750px;
-                margin: 25px auto 35px auto;
-                padding: 20px 80px 60px 40px; /* Większy ale kontrolowany padding */
-            }
-            .alert-summary {
-                margin: 25px auto;
-                padding: 30px;
-                max-height: 600px;
-                font-size: 15px;
-            }
-            .info-bar {
-                margin: 25px auto;
-                padding: 18px;
-                font-size: 16px;
-            }
-            .refresh-btn {
-                margin: 25px auto;
-                padding: 12px 24px;
-                font-size: 18px;
-            }
-        }
-        
-        /* Ultra-wide monitory (2000px+) */
-        @media (min-width: 2000px) {
-            .container {
-                max-width: 2400px;
-                padding: 0 40px;
-            }
-            #chart {
-                min-height: 850px;
-                margin: 30px auto 40px auto;
-                padding: 25px 100px 70px 50px; /* Maksymalny ale bezpieczny padding */
-            }
-            .header h1 {
-                font-size: 3rem;
-            }
-            .header p {
-                font-size: 1.4rem;
-            }
+        @media (min-width: 1201px) {
+            .container { padding: 0 15px; }
+            .header { padding: 25px 15px; }
+            #chart { height: 75vh; min-height: 500px; max-height: 700px; }
         }
     </style>
 </head>
@@ -302,7 +139,9 @@
             Ładowanie danych...
         </div>
         
-        <div id="chart"></div>
+        <div class="chart-container">
+            <div id="chart"></div>
+        </div>
         
         <div class="alert-summary" id="alertSummary">
             <h3>Ładowanie alertów...</h3>
@@ -324,57 +163,58 @@
             lastResetDate: null
         };
         
-        // Funkcja do inteligentnego wykrywania rozdzielczości i skalowania
-        function getSmartScaling() {
+        // Aktualne dane dla resize
+        let currentData = null;
+        
+        // Funkcja do responsywnego layoutu
+        function getResponsiveConfig() {
             const width = window.innerWidth;
-            const height = window.innerHeight;
-            const pixelRatio = window.devicePixelRatio || 1;
-            const realWidth = width * pixelRatio;
-            const realHeight = height * pixelRatio;
             
-            console.log(`Screen: ${width}x${height} (${realWidth}x${realHeight} real, ratio: ${pixelRatio})`);
-            
-            // Klasyfikacja ekranu
-            let screenClass;
+            // Określ rozmiary na podstawie szerokości ekranu
             if (width < 480) {
-                screenClass = 'mobile';
+                return {
+                    fontSize: { title: 14, axis: 10, tick: 9, legend: 9 },
+                    lineWidth: { main: 2, secondary: 1, alert: 2 },
+                    markerSize: 8,
+                    tickInterval: 6, // 6 godzin
+                    margins: { t: 50, r: 20, b: 80, l: 50 },
+                    showAxisTitle: false
+                };
             } else if (width < 768) {
-                screenClass = 'tablet';
+                return {
+                    fontSize: { title: 16, axis: 11, tick: 10, legend: 10 },
+                    lineWidth: { main: 2, secondary: 2, alert: 2 },
+                    markerSize: 10,
+                    tickInterval: 4, // 4 godziny
+                    margins: { t: 60, r: 30, b: 90, l: 60 },
+                    showAxisTitle: true
+                };
             } else if (width < 1200) {
-                screenClass = 'laptop';
-            } else if (width < 1600) {
-                screenClass = 'desktop';
-            } else if (width < 2000) {
-                screenClass = 'large';
+                return {
+                    fontSize: { title: 18, axis: 12, tick: 11, legend: 11 },
+                    lineWidth: { main: 3, secondary: 2, alert: 3 },
+                    markerSize: 12,
+                    tickInterval: 2, // 2 godziny
+                    margins: { t: 70, r: 40, b: 80, l: 70 },
+                    showAxisTitle: true
+                };
             } else {
-                screenClass = 'ultrawide';
+                return {
+                    fontSize: { title: 20, axis: 14, tick: 12, legend: 12 },
+                    lineWidth: { main: 3, secondary: 2, alert: 3 },
+                    markerSize: 14,
+                    tickInterval: 1, // 1 godzina
+                    margins: { t: 80, r: 50, b: 90, l: 80 },
+                    showAxisTitle: true
+                };
             }
-            
-            // Dodatkowe wykrywanie wysokiej rozdzielczości (Retina itp.)
-            const isHighDPI = pixelRatio > 1.5;
-            const isUltraHigh = realWidth > 3000 || realHeight > 1600;
-            
-            return {
-                width,
-                height,
-                pixelRatio,
-                realWidth,
-                realHeight,
-                screenClass,
-                isHighDPI,
-                isUltraHigh,
-                // Skala bazowa od 0.8 do 2.0
-                scale: Math.min(2.0, Math.max(0.8, (realWidth / 1920) * (isHighDPI ? 1.2 : 1.0)))
-            };
         }
         
         // Funkcja do pobierania danych
         async function fetchData() {
             const now = new Date();
-            // ZAWSZE zacznij od północy dzisiejszego dnia w LOKALNEJ strefie czasowej!
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             
-            // Format YYYY-MM-DD w lokalnej strefie czasowej (bez UTC!)
             const startDate = startOfToday.getFullYear() + '-' + 
                             String(startOfToday.getMonth() + 1).padStart(2, '0') + '-' + 
                             String(startOfToday.getDate()).padStart(2, '0');
@@ -384,44 +224,23 @@
                           String(endOfPeriod.getMonth() + 1).padStart(2, '0') + '-' + 
                           String(endOfPeriod.getDate()).padStart(2, '0');
             
-            console.log('Fetching data from midnight today (local):', startDate, '00:00 to:', endDate, '23:59');
+            console.log('Fetching data from:', startDate, 'to:', endDate);
             
             try {
-                // Próba z filtrem i limitem
                 let url = `${API_URL}?$filter=plan_dtime ge '${startDate}' and plan_dtime le '${endDate}'&$orderby=plan_dtime&$first=200`;
                 console.log('Trying URL:', url);
                 
                 let response;
                 try {
-                    response = await fetch(url, {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
+                    response = await fetch(url);
                 } catch (fetchError) {
                     console.error('Fetch error with filter:', fetchError);
-                    // Spróbuj bez filtra
-                    response = await fetch(API_URL + '?$first=200', {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
+                    response = await fetch(API_URL + '?$first=200');
                 }
                 
                 if (!response.ok) {
-                    console.log('Filter failed (status:', response.status, '), trying simple API...');
-                    // Bez filtra ale z limitem
-                    response = await fetch(API_URL + '?$first=200', {
-                        method: 'GET',
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json'
-                        }
-                    });
+                    console.log('Filter failed, trying simple API...');
+                    response = await fetch(API_URL + '?$first=200');
                 }
                 
                 if (response.ok) {
@@ -446,49 +265,36 @@
         // Przetwarzanie danych
         function processData(rawData) {
             const now = new Date();
-            // Zacznij od północy dzisiejszego dnia w LOKALNEJ strefie czasowej!
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
             let processed = [];
             
-            // Sprawdź czy są dane
             if (!rawData || rawData.length === 0) {
                 console.log('No raw data to process');
                 return [];
             }
             
             console.log(`Processing ${rawData.length} raw data records`);
-            console.log('Start of today (local):', startOfToday.toString());
             
-            // Szukaj danych które są od północy dzisiejszego dnia lub później
+            // Szukaj danych od północy dzisiejszego dnia
             const futureData = rawData.filter(item => {
                 if (item.plan_dtime) {
-                    // Parsuj datę z API jako lokalną (nie UTC!)
                     const itemDate = new Date(item.plan_dtime);
-                    
-                    // Loguj pierwszych kilka dla debugowania
-                    if (rawData.indexOf(item) < 3) {
-                        console.log(`Item ${rawData.indexOf(item)}: ${item.plan_dtime} -> ${itemDate.toString()} >= ${startOfToday.toString()}? ${itemDate >= startOfToday}`);
-                    }
-                    
-                    return itemDate >= startOfToday; // Od północy dzisiejszego dnia!
+                    return itemDate >= startOfToday;
                 }
                 return false;
             });
             
-            console.log(`Found ${futureData.length} future data points (from midnight today local time)`);
+            console.log(`Found ${futureData.length} future data points`);
             
-            // Jeśli nie ma danych przyszłych, użyj historycznych ale zacznij od północy DZIŚ
             if (futureData.length === 0) {
                 console.log('No future data found, generating from midnight today...');
                 
-                // Generuj 72 godziny od PÓŁNOCY DZISIEJSZEGO DNIA
                 for (let i = 0; i < 72; i++) {
                     const timestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
-                    const dataIndex = i % rawData.length; // Powtarzaj dane jeśli za mało
+                    const dataIndex = i % rawData.length;
                     const item = rawData[dataIndex];
                     
                     if (item && item.req_pow_res) {
-                        // Oblicz dostępną rezerwę
                         let available = 0;
                         if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
                             available = parseFloat(item.surplus_cap_avail_tso);
@@ -500,14 +306,11 @@
                             available = parseFloat(item.req_pow_res) + 1000;
                         }
                         
-                        // Sprawdź czy wartości są prawidłowe
                         if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
-                            // Format daty jako lokalny string (nie ISO!)
                             const timeStr = timestamp.getFullYear() + '-' + 
                                           String(timestamp.getMonth() + 1).padStart(2, '0') + '-' + 
                                           String(timestamp.getDate()).padStart(2, '0') + ' ' +
-                                          String(timestamp.getHours()).padStart(2, '0') + ':' +
-                                          String(timestamp.getMinutes()).padStart(2, '0') + ':00';
+                                          String(timestamp.getHours()).padStart(2, '0') + ':00:00';
                             
                             processed.push({
                                 time: timestamp,
@@ -518,17 +321,13 @@
                         }
                     }
                 }
-                console.log(`Generated ${processed.length} data points from midnight today`);
             } else {
-                // Użyj danych przyszłych
-                console.log(`Using real future data from midnight today`);
+                console.log('Using real future data');
                 
-                // Dodaj tylko dane od północy dzisiejszego dnia
                 futureData.forEach(item => {
                     if (item.req_pow_res) {
                         const timestamp = new Date(item.plan_dtime);
                         
-                        // Oblicz dostępną rezerwę
                         let available = 0;
                         if (item.surplus_cap_avail_tso !== null && item.surplus_cap_avail_tso !== undefined) {
                             available = parseFloat(item.surplus_cap_avail_tso);
@@ -540,14 +339,11 @@
                             available = parseFloat(item.req_pow_res) + 1000;
                         }
                         
-                        // Sprawdź czy wartości są prawidłowe
                         if (!isNaN(available) && !isNaN(parseFloat(item.req_pow_res))) {
-                            // Format daty jako lokalny string (nie ISO!)
                             const timeStr = timestamp.getFullYear() + '-' + 
                                           String(timestamp.getMonth() + 1).padStart(2, '0') + '-' + 
                                           String(timestamp.getDate()).padStart(2, '0') + ' ' +
-                                          String(timestamp.getHours()).padStart(2, '0') + ':' +
-                                          String(timestamp.getMinutes()).padStart(2, '0') + ':00';
+                                          String(timestamp.getHours()).padStart(2, '0') + ':00:00';
                             
                             processed.push({
                                 time: timestamp,
@@ -559,22 +355,17 @@
                     }
                 });
                 
-                // Jeśli mniej niż 72 godziny, dopełnij OD OSTATNIEGO PUNKTU
+                // Dopełnij do 72 godzin jeśli potrzeba
                 if (processed.length > 0 && processed.length < 72) {
-                    console.log(`Only ${processed.length} future data points, padding to 72...`);
+                    console.log(`Padding to 72 hours from ${processed.length}`);
                     const lastData = processed[processed.length - 1];
-                    const startPaddingFrom = processed.length;
                     
-                    for (let i = startPaddingFrom; i < 72; i++) {
-                        const lastTimestamp = new Date(processed[processed.length - 1].time);
-                        const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
-                        
-                        // Format daty jako lokalny string (nie ISO!)
+                    for (let i = processed.length; i < 72; i++) {
+                        const newTimestamp = new Date(startOfToday.getTime() + i * 60 * 60 * 1000);
                         const timeStr = newTimestamp.getFullYear() + '-' + 
                                       String(newTimestamp.getMonth() + 1).padStart(2, '0') + '-' + 
                                       String(newTimestamp.getDate()).padStart(2, '0') + ' ' +
-                                      String(newTimestamp.getHours()).padStart(2, '0') + ':' +
-                                      String(newTimestamp.getMinutes()).padStart(2, '0') + ':00';
+                                      String(newTimestamp.getHours()).padStart(2, '0') + ':00:00';
                         
                         processed.push({
                             time: newTimestamp,
@@ -583,24 +374,14 @@
                             required: lastData.required
                         });
                     }
-                    console.log(`Padded to ${processed.length} data points`);
                 }
             }
             
-            // Jeśli za dużo danych, ogranicz do 72
             if (processed.length > 72) {
                 processed = processed.slice(0, 72);
             }
             
-            // Jeśli jest cokolwiek, zwróć
-            if (processed.length > 0) {
-                console.log(`Returning ${processed.length} processed data points`);
-                // Sortuj chronologicznie
-                return processed.sort((a, b) => a.time - b.time);
-            } else {
-                console.warn('No valid data points processed');
-                return [];
-            }
+            return processed.sort((a, b) => a.time - b.time);
         }
         
         // Znajdź alerty
@@ -635,7 +416,6 @@
         function updateAlertHistory(newAlerts) {
             const today = new Date().toDateString();
             
-            // Reset jeśli nowy dzień
             if (alertHistory.lastResetDate !== today) {
                 alertHistory = {
                     orange: [],
@@ -644,7 +424,6 @@
                 };
             }
             
-            // Dodaj nowe unikalne alerty
             newAlerts.orange.forEach(alert => {
                 if (!alertHistory.orange.some(a => a.time === alert.time)) {
                     alertHistory.orange.push(alert);
@@ -661,6 +440,13 @@
         // Rysuj wykres
         function drawChart(data) {
             console.log(`Drawing chart with ${data.length} data points`);
+            
+            if (!data || data.length === 0) {
+                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c; padding: 50px;">Brak danych do wyświetlenia</h2>';
+                return;
+            }
+            
+            const config = getResponsiveConfig();
             const times = data.map(d => d.timeStr);
             const reserves = data.map(d => d.reserve);
             const required = data.map(d => d.required);
@@ -668,11 +454,7 @@
             // Znajdź unikalne dni
             const uniqueDates = [...new Set(data.map(d => d.timeStr.substring(0, 10)))];
             
-            // Pionowe linie na granicach dni - grubsze na dużych ekranach
-            const separatorWidth = window.innerWidth < 768 ? 1 : 
-                                  window.innerWidth < 1400 ? 2 :
-                                  window.innerWidth < 1600 ? 3 : 4;
-            
+            // Pionowe linie na granicach dni
             const shapes = [];
             uniqueDates.slice(1).forEach(date => {
                 shapes.push({
@@ -683,19 +465,15 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#95a5a6',
-                        width: separatorWidth,
+                        width: 2,
                         dash: 'dash'
                     }
                 });
             });
             
-            // Znajdź alerty dla linii - grubsze na dużych ekranach
+            // Znajdź alerty i dodaj linie
             const alerts = findAlerts(data);
-            const alertLineWidth = window.innerWidth < 768 ? 2 : 
-                                 window.innerWidth < 1400 ? 3 :
-                                 window.innerWidth < 1600 ? 4 : 5;
             
-            // Dodaj linie alertów
             alerts.orange.forEach(alert => {
                 shapes.push({
                     type: 'line',
@@ -705,7 +483,7 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#f39c12',
-                        width: alertLineWidth,
+                        width: config.lineWidth.alert,
                         dash: 'dot'
                     }
                 });
@@ -720,7 +498,7 @@
                     y1: Math.max(...reserves) * 1.1,
                     line: {
                         color: '#e74c3c',
-                        width: alertLineWidth + 1,
+                        width: config.lineWidth.alert + 1,
                         dash: 'dot'
                     }
                 });
@@ -729,18 +507,12 @@
             // Znajdź aktualną godzinę
             const now = new Date();
             const currentHour = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours());
-            
-            // Format daty jako lokalny string (nie ISO!)
             const currentHourStr = currentHour.getFullYear() + '-' + 
                                  String(currentHour.getMonth() + 1).padStart(2, '0') + '-' + 
                                  String(currentHour.getDate()).padStart(2, '0') + ' ' +
                                  String(currentHour.getHours()).padStart(2, '0') + ':00:00';
             
-            // Traces - dostosowane grubości linii do rozmiaru ekranu
-            const lineWidth = window.innerWidth < 768 ? 2 : 
-                            window.innerWidth < 1400 ? 3 :
-                            window.innerWidth < 1600 ? 4 : 5;
-            
+            // Traces
             const traces = [
                 {
                     x: times,
@@ -748,7 +520,7 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Rezerwa mocy',
-                    line: { color: '#27ae60', width: lineWidth }
+                    line: { color: '#27ae60', width: config.lineWidth.main }
                 },
                 {
                     x: times,
@@ -756,7 +528,7 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Wymagana rezerwa mocy',
-                    line: { color: '#2c3e50', width: lineWidth - 1 }
+                    line: { color: '#2c3e50', width: config.lineWidth.secondary }
                 },
                 {
                     x: times,
@@ -764,28 +536,24 @@
                     type: 'scatter',
                     mode: 'lines',
                     name: 'Stała linia (1100 MW)',
-                    line: { color: '#e74c3c', width: Math.max(1, lineWidth - 2), dash: 'dash' }
+                    line: { color: '#e74c3c', width: 1, dash: 'dash' }
                 }
             ];
             
-            // Dodaj czerwoną kropkę dla aktualnej godziny - większą na dużych ekranach
+            // Dodaj czerwoną kropkę dla aktualnej godziny
             const currentIndex = times.indexOf(currentHourStr);
             if (currentIndex !== -1) {
-                const markerSize = window.innerWidth < 768 ? 8 : 
-                                window.innerWidth < 1400 ? 12 :
-                                window.innerWidth < 1600 ? 16 : 20;
-                
                 traces.push({
                     x: [currentHourStr],
                     y: [reserves[currentIndex]],
                     type: 'scatter',
                     mode: 'markers',
                     name: `Aktualna godzina (${currentHour.getHours()}:00)`,
-                    marker: { color: '#e74c3c', size: markerSize }
+                    marker: { color: '#e74c3c', size: config.markerSize }
                 });
             }
             
-            // Etykiety dat - dopasowane do rozmiaru ekranu
+            // Etykiety dat
             const annotations = [];
             if (window.innerWidth >= 480) {
                 annotations.push(...uniqueDates.map(date => ({
@@ -793,112 +561,61 @@
                     y: Math.max(...reserves) * 1.05,
                     text: `<b>${date.split('-').reverse().join('.')}</b>`,
                     showarrow: false,
-                    font: { 
-                        size: window.innerWidth < 768 ? 10 : 
-                              window.innerWidth < 1400 ? 12 :
-                              window.innerWidth < 1600 ? 14 : 16, 
-                        color: '#2c3e50' 
-                    }
+                    font: { size: config.fontSize.axis, color: '#2c3e50' }
                 })));
             }
             
             // Layout
             const layout = {
                 title: {
-                    text: window.innerWidth < 480 ? 'Prognoza rezerw mocy (72h)' : 'Prognoza rezerw mocy na następne 72 godziny',
-                    font: { 
-                        size: window.innerWidth < 480 ? 12 : 
-                              window.innerWidth < 768 ? 14 : 
-                              window.innerWidth < 1400 ? 18 :
-                              window.innerWidth < 1600 ? 22 : 26
-                    }
+                    text: window.innerWidth < 600 ? 'Prognoza rezerw mocy (72h)' : 'Prognoza rezerw mocy na następne 72 godziny',
+                    font: { size: config.fontSize.title, color: '#2c3e50' }
                 },
                 shapes: shapes,
                 annotations: annotations,
                 xaxis: {
-                    title: window.innerWidth < 480 ? '' : 'Czas',
-                    titlefont: { 
-                        size: window.innerWidth < 480 ? 10 : 
-                              window.innerWidth < 768 ? 12 :
-                              window.innerWidth < 1400 ? 14 :
-                              window.innerWidth < 1600 ? 16 : 18
-                    },
+                    title: config.showAxisTitle ? 'Czas' : '',
+                    titlefont: { size: config.fontSize.axis },
                     tickangle: window.innerWidth < 768 ? -45 : 45,
                     showgrid: true,
                     gridcolor: '#ecf0f1',
                     tickformat: '%H:%M',
                     tickmode: 'linear',
                     tick0: times[0],
-                    dtick: window.innerWidth < 480 ? 21600000 : 
-                           window.innerWidth < 768 ? 14400000 : 
-                           window.innerWidth < 1400 ? 7200000 :
-                           3600000, // 6h/4h/2h/1h w zależności od rozmiaru
-                    tickfont: { 
-                        size: window.innerWidth < 480 ? 8 : 
-                              window.innerWidth < 768 ? 9 : 
-                              window.innerWidth < 1400 ? 11 :
-                              window.innerWidth < 1600 ? 13 : 15
-                    }
+                    dtick: config.tickInterval * 3600000, // godziny na milisekundy
+                    tickfont: { size: config.fontSize.tick }
                 },
                 yaxis: {
-                    title: window.innerWidth < 480 ? 'MW' : 
-                           window.innerWidth < 768 ? 'Rezerwa mocy [MW]' : 
-                           'Rezerwa mocy / Wymagana rezerwa mocy [MW]',
-                    titlefont: { 
-                        size: window.innerWidth < 480 ? 10 : 
-                              window.innerWidth < 768 ? 12 :
-                              window.innerWidth < 1400 ? 14 :
-                              window.innerWidth < 1600 ? 16 : 18
-                    },
+                    title: config.showAxisTitle ? 
+                           (window.innerWidth < 600 ? 'MW' : 'Rezerwa mocy [MW]') : 'MW',
+                    titlefont: { size: config.fontSize.axis },
                     showgrid: true,
                     gridcolor: '#ecf0f1',
-                    tickfont: { 
-                        size: window.innerWidth < 480 ? 8 : 
-                              window.innerWidth < 768 ? 9 : 
-                              window.innerWidth < 1400 ? 11 :
-                              window.innerWidth < 1600 ? 13 : 15
-                    }
+                    tickfont: { size: config.fontSize.tick }
                 },
                 plot_bgcolor: 'white',
                 paper_bgcolor: 'white',
                 hovermode: 'x unified',
                 legend: {
                     orientation: 'h',
-                    y: window.innerWidth < 480 ? -0.35 : 
-                       window.innerWidth < 768 ? -0.25 : 
-                       window.innerWidth < 1400 ? -0.15 : -0.12,
+                    y: -0.15,
                     x: 0.5,
                     xanchor: 'center',
-                    font: { 
-                        size: window.innerWidth < 480 ? 8 : 
-                              window.innerWidth < 768 ? 9 : 
-                              window.innerWidth < 1400 ? 11 :
-                              window.innerWidth < 1600 ? 13 : 15
-                    }
+                    font: { size: config.fontSize.legend }
                 },
-                margin: {
-                    t: window.innerWidth < 480 ? 40 : 
-                       window.innerWidth < 768 ? 50 : 
-                       window.innerWidth < 1400 ? 70 :
-                       window.innerWidth < 1600 ? 80 : 90,
-                    r: window.innerWidth < 480 ? 3 : 
-                       window.innerWidth < 768 ? 8 : 
-                       window.innerWidth < 1400 ? 15 :
-                       window.innerWidth < 1600 ? 20 : 25,
-                    b: window.innerWidth < 480 ? 80 : 
-                       window.innerWidth < 768 ? 70 : 
-                       window.innerWidth < 1400 ? 60 :
-                       window.innerWidth < 1600 ? 70 : 80,
-                    l: window.innerWidth < 480 ? 30 : 
-                       window.innerWidth < 768 ? 45 : 
-                       window.innerWidth < 1400 ? 65 :
-                       window.innerWidth < 1600 ? 75 : 85
-                },
-                autosize: true
+                margin: config.margins,
+                autosize: true,
+                responsive: true
             };
             
+            // Zapisz dane dla resize
+            currentData = data;
+            
             // Rysuj
-            Plotly.newPlot('chart', traces, layout, {responsive: true});
+            Plotly.newPlot('chart', traces, layout, {
+                responsive: true,
+                displayModeBar: false
+            });
         }
         
         // Aktualizuj podsumowanie alertów
@@ -909,7 +626,6 @@
             if (alertHistory.orange.length > 0 || alertHistory.red.length > 0) {
                 html += '<h3 class="danger">⚠️ Historia alertów z dzisiejszej doby:</h3>';
                 
-                // Czerwone alerty
                 if (alertHistory.red.length > 0) {
                     html += `<h4 class="danger">🔴 Alerty czerwone (margines ≤ ${ALERT_THRESHOLD_RED} MW): ${alertHistory.red.length}</h4>`;
                     alertHistory.red.sort((a, b) => a.time.localeCompare(b.time)).forEach(alert => {
@@ -919,7 +635,6 @@
                     });
                 }
                 
-                // Pomarańczowe alerty
                 if (alertHistory.orange.length > 0) {
                     html += `<h4 class="warning">🟠 Alerty pomarańczowe (margines ≤ ${ALERT_THRESHOLD_ORANGE} MW): ${alertHistory.orange.length}</h4>`;
                     alertHistory.orange.sort((a, b) => a.time.localeCompare(b.time)).forEach(alert => {
@@ -946,37 +661,22 @@
             
             if (data && data.length > 0) {
                 console.log(`Loaded ${data.length} data points`);
-                console.log('Data range:', data[0].timeStr, 'to', data[data.length-1].timeStr);
                 
-                // Rysuj wykres
                 drawChart(data);
                 
-                // Znajdź i zaktualizuj alerty
                 const alerts = findAlerts(data);
                 updateAlertHistory(alerts);
                 updateAlertSummary();
                 
-                // Info bar - pokazuj dokładny zakres danych (używa inteligentnego skalowania)
                 const startTime = new Date(data[0].timeStr);
                 const endTime = new Date(data[data.length-1].timeStr);
-                const scaling = getSmartScaling();
+                const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
+                const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                 
                 let infoText;
-                if (scaling.screenClass === 'mobile') {
-                    // Bardzo skrócona wersja na mobile
-                    const startFormatted = startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
-                    const endFormatted = endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'});
-                    const timeFormatted = now.split(' ')[1].substring(0,5); // HH:MM
-                    infoText = `PSE API | ${startFormatted}-${endFormatted} | ${timeFormatted}`;
-                } else if (scaling.screenClass === 'tablet') {
-                    // Skrócona wersja na tablet
-                    const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                    const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                    infoText = `API PSE | ${startFormatted} - ${endFormatted} | Aktualizacja: ${now}`;
+                if (window.innerWidth < 600) {
+                    infoText = `PSE API | ${startTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'})} - ${endTime.toLocaleDateString('pl-PL', {day: '2-digit', month: '2-digit'})} | ${now.split(' ')[1].substring(0,5)}`;
                 } else {
-                    // Pełna wersja na desktop/large/ultrawide
-                    const startFormatted = startTime.toLocaleDateString('pl-PL') + ' ' + startTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
-                    const endFormatted = endTime.toLocaleDateString('pl-PL') + ' ' + endTime.toLocaleTimeString('pl-PL', {hour: '2-digit', minute: '2-digit'});
                     infoText = `Źródło: API PSE | Zakres: ${startFormatted} - ${endFormatted} | Ostatnia aktualizacja: ${now}`;
                 }
                 
@@ -985,63 +685,28 @@
                 infoBar.style.borderColor = '#2980b9';
             } else {
                 console.warn('No data to display');
-                // Info bar z czerwonym tłem
                 infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
                 infoBar.style.backgroundColor = '#fee';
                 infoBar.style.borderColor = '#e74c3c';
-                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br><br>Sprawdź połączenie internetowe<br>lub spróbuj odświeżyć stronę (F5)<br><br><small>Sprawdź konsolę przeglądarki (F12) dla szczegółów</small></h2>';
-                
-                // Pokaż historię alertów mimo braku nowych danych
+                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c; padding: 50px;">Brak danych z API PSE<br><br>Sprawdź połączenie internetowe<br>lub spróbuj odświeżyć stronę</h2>';
                 updateAlertSummary();
             }
         }
         
-        // Test CORS na starcie
-        async function testCORS() {
-            try {
-                const response = await fetch(API_URL + '?$first=1');
-                if (response.ok) {
-                    console.log('✓ CORS is working');
-                } else {
-                    console.error('✗ CORS error - status:', response.status);
+        // Obsługa resize z debounce
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                console.log('Window resized, redrawing chart...');
+                if (currentData && currentData.length > 0) {
+                    drawChart(currentData);
                 }
-            } catch (error) {
-                console.error('✗ CORS blocked:', error);
-                console.warn('Uwaga: API PSE może być zablokowane przez CORS. Spróbuj otworzyć stronę w innym przeglądarce.');
-            }
-        }
-        
-        // Test CORS
-        testCORS();
+            }, 250);
+        });
         
         // Automatyczne odświeżanie co 15 minut
         setInterval(refreshData, 15 * 60 * 1000);
-        
-        // Ponowne rysowanie przy zmianie rozmiaru okna (z throttling)
-        let resizeTimer;
-        window.addEventListener('resize', () => {
-            clearTimeout(resizeTimer);
-            resizeTimer = setTimeout(() => {
-                const chart = document.getElementById('chart');
-                if (chart && chart.data) {
-                    console.log('Window resized, redrawing chart with smart scaling...');
-                    // Jeśli mamy dane, przerysuj wykres
-                    const currentData = chart.data;
-                    if (currentData && currentData.length > 0) {
-                        // Symuluj dane w odpowiednim formacie
-                        const simulatedData = [];
-                        for (let i = 0; i < currentData[0].x.length; i++) {
-                            simulatedData.push({
-                                timeStr: currentData[0].x[i],
-                                reserve: currentData[0].y[i],
-                                required: currentData[1] ? currentData[1].y[i] : 0
-                            });
-                        }
-                        drawChart(simulatedData);
-                    }
-                }
-            }, 300); // Throttle na 300ms
-        });
         
         // Pierwsze ładowanie
         refreshData();
