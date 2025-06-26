@@ -1,36 +1,4 @@
-// Znajdź alerty dla linii
-            const alerts = findAlerts(data);
-            
-            // Dodaj linie alertów
-            alerts.orange.forEach(alert => {
-                shapes.push({
-                    type: 'line',
-                    x0: alert.time,
-                    y0: 0,
-                    x1: alert.time,
-                    y1: Math.max(...reserves) * 1.1,
-                    line: {
-                        color: '#f39c12',
-                        width: 2,
-                        dash: 'dot'
-                    }
-                });
-            });
-            
-            alerts.red.forEach(alert => {
-                shapes.push({
-                    type: 'line',
-                    x0: alert.time,
-                    y0: 0,
-                    x1: alert.time,
-                    y1: Math.max(...reserves) * 1.1,
-                    line: {
-                        color: '#e74c3c',
-                        width: 3,
-                        dash: 'dot'
-                    }
-                });
-            });<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl">
 <head>
     <meta charset="UTF-8">
@@ -245,7 +213,7 @@
         function processData(rawData) {
             const now = new Date();
             const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const processed = [];
+            let processed = [];
             
             // Sprawdź czy są dane
             if (!rawData || rawData.length === 0) {
@@ -336,6 +304,8 @@
                 // Jeśli mniej niż 72 godziny, dopełnij
                 if (processed.length > 0 && processed.length < 72) {
                     console.log(`Only ${processed.length} future data points, padding to 72...`);
+                    const lastData = processed[processed.length - 1];
+                    
                     while (processed.length < 72) {
                         const lastTimestamp = new Date(processed[processed.length - 1].time);
                         const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
@@ -348,24 +318,6 @@
                         });
                     }
                     console.log(`Padded to ${processed.length} data points`);
-                }
-            }
-            
-            // Jeśli mniej niż 72 godziny, dopełnij ostatnimi wartościami
-            if (processed.length > 0 && processed.length < 72) {
-                console.log(`Only ${processed.length} data points, padding to 72...`);
-                const lastData = processed[processed.length - 1];
-                
-                while (processed.length < 72) {
-                    const lastTimestamp = new Date(processed[processed.length - 1].time);
-                    const newTimestamp = new Date(lastTimestamp.getTime() + 60 * 60 * 1000); // +1 godzina
-                    
-                    processed.push({
-                        time: newTimestamp,
-                        timeStr: newTimestamp.toISOString().replace('T', ' ').slice(0, 19),
-                        reserve: lastData.reserve,
-                        required: lastData.required
-                    });
                 }
             }
             
@@ -660,17 +612,17 @@
                 
                 // Info bar
                 infoBar.innerHTML = `Źródło: API PSE | Okres: dziś + 2 dni | Ostatnia aktualizacja: ${now}`;
-                } else {
-                    console.warn('No data to display');
-                    // Info bar z czerwonym tłem
-                    infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
-                    infoBar.style.backgroundColor = '#fee';
-                    infoBar.style.borderColor = '#e74c3c';
-                    document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br><br>Sprawdź połączenie internetowe<br>lub spróbuj odświeżyć stronę (F5)<br><br><small>Sprawdź konsolę przeglądarki (F12) dla szczegółów</small></h2>';
-                    
-                    // Pokaż historię alertów mimo braku nowych danych
-                    updateAlertSummary();
-                }
+            } else {
+                console.warn('No data to display');
+                // Info bar z czerwonym tłem
+                infoBar.innerHTML = `<span class="error">❌ Brak połączenia z API PSE | Ostatnia próba: ${now}</span>`;
+                infoBar.style.backgroundColor = '#fee';
+                infoBar.style.borderColor = '#e74c3c';
+                document.getElementById('chart').innerHTML = '<h2 style="text-align: center; color: #e74c3c;">Brak danych z API PSE<br><br>Sprawdź połączenie internetowe<br>lub spróbuj odświeżyć stronę (F5)<br><br><small>Sprawdź konsolę przeglądarki (F12) dla szczegółów</small></h2>';
+                
+                // Pokaż historię alertów mimo braku nowych danych
+                updateAlertSummary();
+            }
         }
         
         // Test CORS na starcie
