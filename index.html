@@ -19,9 +19,9 @@
             line-height: 1.4;
         }
         .container {
-            max-width: 1400px;
+            max-width: 95vw;
             margin: 0 auto;
-            padding: 0 10px;
+            padding: 0 1vw;
         }
         .header {
             background-color: #2c3e50;
@@ -64,9 +64,9 @@
         }
         #chart {
             width: 100%;
-            height: 70vh;
-            min-height: 400px;
-            max-height: 800px;
+            height: 80vh;
+            min-height: 500px;
+            max-height: 900px;
         }
         .alert-summary {
             background: white;
@@ -101,30 +101,36 @@
 
         /* Responsive breakpoints */
         @media (max-width: 480px) {
-            .container { padding: 0 5px; }
-            .header { padding: 15px 5px; }
-            .info-bar, .alert-summary { margin: 10px 0; padding: 10px; }
-            .chart-container { margin: 10px 0; padding: 5px; }
-            #chart { height: 60vh; min-height: 300px; }
+            .container { padding: 0 2vw; }
+            .header { padding: 15px 2vw; }
+            .info-bar, .alert-summary { margin: 8px 0; padding: 8px; }
+            .chart-container { margin: 8px 0; padding: 3px; }
+            #chart { height: 65vh; min-height: 350px; }
             .refresh-btn { padding: 8px 16px; font-size: 13px; }
         }
         
         @media (min-width: 481px) and (max-width: 768px) {
-            .container { padding: 0 8px; }
-            .header { padding: 18px 8px; }
-            #chart { height: 65vh; min-height: 350px; }
+            .container { padding: 0 1.5vw; }
+            .header { padding: 18px 1.5vw; }
+            #chart { height: 75vh; min-height: 400px; }
         }
         
         @media (min-width: 769px) and (max-width: 1200px) {
-            .container { padding: 0 12px; }
-            .header { padding: 22px 12px; }
-            #chart { height: 70vh; min-height: 450px; }
+            .container { padding: 0 1vw; }
+            .header { padding: 20px 1vw; }
+            #chart { height: 80vh; min-height: 500px; }
         }
         
         @media (min-width: 1201px) {
-            .container { padding: 0 15px; }
-            .header { padding: 25px 15px; }
-            #chart { height: 75vh; min-height: 500px; max-height: 700px; }
+            .container { padding: 0 1vw; }
+            .header { padding: 22px 1vw; }
+            #chart { height: 82vh; min-height: 550px; max-height: 850px; }
+        }
+        
+        @media (min-width: 1600px) {
+            .container { max-width: 98vw; padding: 0 0.5vw; }
+            .header { padding: 25px 0.5vw; }
+            #chart { height: 85vh; min-height: 600px; max-height: 1000px; }
         }
     </style>
 </head>
@@ -177,7 +183,7 @@
                     lineWidth: { main: 2, secondary: 1, alert: 2 },
                     markerSize: 8,
                     tickInterval: 6, // 6 godzin
-                    margins: { t: 50, r: 20, b: 80, l: 50 },
+                    margins: { t: 40, r: 15, b: 70, l: 45 },
                     showAxisTitle: false
                 };
             } else if (width < 768) {
@@ -186,7 +192,7 @@
                     lineWidth: { main: 2, secondary: 2, alert: 2 },
                     markerSize: 10,
                     tickInterval: 4, // 4 godziny
-                    margins: { t: 60, r: 30, b: 90, l: 60 },
+                    margins: { t: 50, r: 20, b: 80, l: 50 },
                     showAxisTitle: true
                 };
             } else if (width < 1200) {
@@ -195,16 +201,25 @@
                     lineWidth: { main: 3, secondary: 2, alert: 3 },
                     markerSize: 12,
                     tickInterval: 2, // 2 godziny
-                    margins: { t: 70, r: 40, b: 80, l: 70 },
+                    margins: { t: 60, r: 25, b: 70, l: 60 },
                     showAxisTitle: true
                 };
-            } else {
+            } else if (width < 1600) {
                 return {
                     fontSize: { title: 20, axis: 14, tick: 12, legend: 12 },
                     lineWidth: { main: 3, secondary: 2, alert: 3 },
                     markerSize: 14,
                     tickInterval: 1, // 1 godzina
-                    margins: { t: 80, r: 50, b: 90, l: 80 },
+                    margins: { t: 70, r: 30, b: 80, l: 70 },
+                    showAxisTitle: true
+                };
+            } else {
+                return {
+                    fontSize: { title: 22, axis: 16, tick: 13, legend: 13 },
+                    lineWidth: { main: 4, secondary: 3, alert: 4 },
+                    markerSize: 16,
+                    tickInterval: 1, // 1 godzina
+                    margins: { t: 80, r: 35, b: 90, l: 80 },
                     showAxisTitle: true
                 };
             }
