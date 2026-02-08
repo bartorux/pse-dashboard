@@ -5,7 +5,7 @@ import KseLiveDashboard from "@/components/kse-live-dashboard";
 export default function KseLivePage() {
   return (
     <div className="min-h-screen">
-      <header className="container flex flex-wrap items-center justify-between gap-4 py-6">
+      <header className="mx-auto flex w-full max-w-[1680px] flex-wrap items-center justify-between gap-4 px-6 py-6 lg:px-10 2xl:max-w-[1760px]">
         <div>
           <p className="text-xs uppercase tracking-[0.4em] text-muted-foreground">
             Energia na żywo
@@ -18,7 +18,7 @@ export default function KseLivePage() {
         </div>
       </header>
 
-      <main className="container space-y-10 pb-24">
+      <main className="mx-auto w-full max-w-[1680px] space-y-10 px-6 pb-24 lg:px-10 2xl:max-w-[1760px]">
         <Card className="border-border/60 bg-white/70">
           <CardHeader>
             <CardTitle className="text-2xl">Co tu zobaczysz</CardTitle>
