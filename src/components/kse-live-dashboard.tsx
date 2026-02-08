@@ -760,17 +760,19 @@ function MetricCard({
   label,
   value,
   helper,
-  trend
+  trend,
+  className
 }: {
   label: string;
   value: string;
   helper?: string;
   trend?: { value: number | null; percent: number | null };
+  className?: string;
 }) {
   const hasTrend = trend?.value !== null && trend?.value !== undefined;
   const isPositive = (trend?.value ?? 0) >= 0;
   return (
-    <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+    <Card className={`border-border/60 bg-white/80 rise-in hover-lift ${className ?? ""}`}>
       <CardHeader className="space-y-2">
         <p className="text-xs uppercase tracking-[0.3em] text-muted-foreground">
           {label}
@@ -2688,6 +2690,9 @@ export default function KseLiveDashboard() {
   ]);
 
   const hasPanel = Boolean(panel);
+  const panelItemClass = hasPanel ? "is-panel-item" : "";
+  const activePanelClass = (id: PanelId) =>
+    hasPanel && activePanel === id ? "is-panel-item-active" : "";
   const metricsGridClass = hasPanel
     ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-1"
     : "grid gap-6 md:grid-cols-2 xl:grid-cols-4";
@@ -2797,40 +2802,64 @@ export default function KseLiveDashboard() {
       </div>
 
       <div className={metricsGridClass}>
-        <MetricCard
-          label="Aktualne obciazenie"
-          value={formatValue(loadStats?.last ?? null, loadConfig?.unit)}
-          helper={
-            loadActualKey
+        {[
+          {
+            id: "load",
+            label: "Aktualne obciazenie",
+            value: formatValue(loadStats?.last ?? null, loadConfig?.unit),
+            helper: loadActualKey
               ? "Zrodlo: obciazenie rzeczywiste"
               : loadValueKey
               ? "Zrodlo: wartosc glowna"
-              : "Brak danych"
+              : "Brak danych",
+            trend: { value: loadStats?.delta ?? null, percent: loadStats?.deltaPct ?? null }
+          },
+          {
+            id: "trend",
+            label: "Szczyt okna",
+            value: formatValue(loadStats?.max ?? null, loadConfig?.unit),
+            helper: "Okno analizy"
+          },
+          {
+            id: "trend",
+            label: "Minimum okna",
+            value: formatValue(loadStats?.min ?? null, loadConfig?.unit),
+            helper: "Okno analizy"
+          },
+          {
+            id: "trend",
+            label: "Srednia",
+            value: formatValue(loadStats?.avg ?? null, loadConfig?.unit),
+            helper: "Srednia z okna"
           }
-          trend={{ value: loadStats?.delta ?? null, percent: loadStats?.deltaPct ?? null }}
-        />
-        <MetricCard
-          label="Szczyt okna"
-          value={formatValue(loadStats?.max ?? null, loadConfig?.unit)}
-          helper="Okno analizy"
-        />
-        <MetricCard
-          label="Minimum okna"
-          value={formatValue(loadStats?.min ?? null, loadConfig?.unit)}
-          helper="Okno analizy"
-        />
-        <MetricCard
-          label="Srednia"
-          value={formatValue(loadStats?.avg ?? null, loadConfig?.unit)}
-          helper="Srednia z okna"
-        />
+        ].map((item, index) => (
+          <div
+            key={`${item.label}-${index}`}
+            onClick={() => setActivePanel(item.id as PanelId)}
+            className={`cursor-pointer ${
+              hasPanel ? "is-panel-item" : ""
+            } ${highlightClass(item.id as SectionId)}`}
+          >
+            <MetricCard
+              label={item.label}
+              value={item.value}
+              helper={item.helper}
+              trend={item.trend}
+              className={`${panelItemClass} ${activePanelClass(item.id as PanelId)}`}
+            />
+          </div>
+        ))}
       </div>
 
       <div
         ref={(node) => setSectionRef("load", node)}
         className={highlightClass("load")}
       >
-        <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+        <Card
+          className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+            "load"
+          )}`}
+        >
           <CardHeader className="space-y-2">
             <div
               className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -2899,7 +2928,11 @@ export default function KseLiveDashboard() {
         </Card>
       </div>
 
-      <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+      <Card
+        className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+          "heatmap"
+        )}`}
+      >
         <CardHeader className="space-y-2">
             <div
               className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -2989,7 +3022,11 @@ export default function KseLiveDashboard() {
         ref={(node) => setSectionRef("forecast", node)}
         className={highlightClass("forecast")}
       >
-        <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+        <Card
+          className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+            "forecast"
+          )}`}
+        >
           <CardHeader className="space-y-2">
             <div
               className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3054,7 +3091,11 @@ export default function KseLiveDashboard() {
       </div>
 
       <div className={summaryGridClass}>
-        <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+        <Card
+          className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+            "summary"
+          )}`}
+        >
           <CardHeader>
             <div
               className="flex items-center justify-between gap-2 cursor-pointer"
@@ -3088,7 +3129,11 @@ export default function KseLiveDashboard() {
           </CardContent>
         </Card>
 
-        <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+        <Card
+          className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+            "trend"
+          )}`}
+        >
           <CardHeader>
             <div
               className="flex items-center justify-between gap-2 cursor-pointer"
@@ -3132,7 +3177,11 @@ export default function KseLiveDashboard() {
             ref={(node) => setSectionRef("peak", node)}
             className={highlightClass("peak")}
           >
-          <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+          <Card
+            className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+              "peak"
+            )}`}
+          >
             <CardHeader className="space-y-2">
               <div
                 className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3186,7 +3235,11 @@ export default function KseLiveDashboard() {
           ref={(node) => setSectionRef("prices", node)}
           className={highlightClass("prices")}
         >
-          <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+          <Card
+            className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+              "prices"
+            )}`}
+          >
             <CardHeader className="space-y-2">
               <div
                 className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3247,7 +3300,11 @@ export default function KseLiveDashboard() {
         </div>
         </div>
 
-        <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+        <Card
+          className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+            "alerts"
+          )}`}
+        >
           <CardHeader>
             <div
               className="flex items-center justify-between gap-2 cursor-pointer"
@@ -3284,7 +3341,11 @@ export default function KseLiveDashboard() {
           ref={(node) => setSectionRef("generation", node)}
           className={highlightClass("generation")}
         >
-          <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+          <Card
+            className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+              "generation"
+            )}`}
+          >
             <CardHeader className="space-y-2">
               <div
                 className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3336,7 +3397,11 @@ export default function KseLiveDashboard() {
           ref={(node) => setSectionRef("network", node)}
           className={highlightClass("network")}
         >
-          <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+          <Card
+            className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+              "network"
+            )}`}
+          >
             <CardHeader className="space-y-2">
               <div
                 className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3385,7 +3450,11 @@ export default function KseLiveDashboard() {
           }}
           className={highlightClass(["afrr", "reserve"])}
         >
-          <Card className="border-border/60 bg-white/80 rise-in hover-lift">
+          <Card
+            className={`border-border/60 bg-white/80 rise-in hover-lift ${panelItemClass} ${activePanelClass(
+              "reserve"
+            )}`}
+          >
             <CardHeader className="space-y-2">
               <div
                 className="flex flex-wrap items-center justify-between gap-2 cursor-pointer"
@@ -3461,23 +3530,25 @@ export default function KseLiveDashboard() {
                   Zamknij
                 </Button>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2">
-                {panelNavItems.map((item) => (
-                  <button
-                    key={item.id}
-                    type="button"
-                    onClick={() => setActivePanel(item.id)}
-                    className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
-                      activePanel === item.id
-                        ? "border-primary bg-primary text-primary-foreground"
-                        : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
               <div className="mt-4 max-h-[calc(100vh-10rem)] overflow-auto overflow-x-hidden pr-1">
+                <div className="sticky top-0 z-10 -mx-1 mb-3 rounded-xl border border-border/60 bg-white/95 px-2 py-2 backdrop-blur">
+                  <div className="flex flex-wrap gap-2">
+                    {panelNavItems.map((item) => (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => setActivePanel(item.id)}
+                        className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                          activePanel === item.id
+                            ? "border-primary bg-primary text-primary-foreground"
+                            : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
                 {panel.content}
               </div>
             </div>
@@ -3500,23 +3571,25 @@ export default function KseLiveDashboard() {
               Zamknij
             </Button>
           </div>
-          <div className="mt-3 flex flex-wrap gap-2">
-            {panelNavItems.map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => setActivePanel(item.id)}
-                className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
-                  activePanel === item.id
-                    ? "border-primary bg-primary text-primary-foreground"
-                    : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {item.label}
-              </button>
-            ))}
-          </div>
           <div className="mt-3 max-h-[55vh] overflow-auto overflow-x-hidden pr-1">
+            <div className="sticky top-0 z-10 -mx-1 mb-3 rounded-xl border border-border/60 bg-white/95 px-2 py-2 backdrop-blur">
+              <div className="flex flex-wrap gap-2">
+                {panelNavItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActivePanel(item.id)}
+                    className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                      activePanel === item.id
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
             {panel.content}
           </div>
         </div>
