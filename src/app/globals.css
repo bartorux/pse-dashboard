@@ -35,6 +35,12 @@ body {
   color: hsl(var(--foreground));
 }
 
+@media (min-width: 1024px) {
+  body.kse-panel-open .kse-intro {
+    display: none;
+  }
+}
+
 ::selection {
   background: hsl(var(--primary));
   color: hsl(var(--primary-foreground));

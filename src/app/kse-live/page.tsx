@@ -19,7 +19,7 @@ export default function KseLivePage() {
       </header>
 
       <main className="mx-auto w-full max-w-[1680px] space-y-10 px-6 pb-24 lg:px-10 2xl:max-w-[1760px]">
-        <Card className="border-border/60 bg-white/70">
+        <Card className="kse-intro border-border/60 bg-white/70">
           <CardHeader>
             <CardTitle className="text-2xl">Co tu zobaczysz</CardTitle>
           </CardHeader>

@@ -2703,12 +2703,25 @@ export default function KseLiveDashboard() {
     ? "grid gap-3 sm:grid-cols-1"
     : "grid gap-3 sm:grid-cols-3";
 
+  React.useEffect(() => {
+    if (typeof document === "undefined") return;
+    const className = "kse-panel-open";
+    if (hasPanel) {
+      document.body.classList.add(className);
+    } else {
+      document.body.classList.remove(className);
+    }
+    return () => {
+      document.body.classList.remove(className);
+    };
+  }, [hasPanel]);
+
   return (
-    <div className="lg:flex lg:items-start lg:gap-8">
+    <div className="lg:flex lg:items-start lg:gap-6">
       <section
         className={`space-y-10 transition-all duration-300 ${
           hasPanel
-            ? "lg:basis-[34%] lg:max-w-[34%]"
+            ? "lg:basis-[30%] lg:max-w-[30%]"
             : "lg:basis-full lg:max-w-full"
         }`}
       >
@@ -3393,7 +3406,7 @@ export default function KseLiveDashboard() {
       <aside
         className={`hidden lg:block transition-all duration-300 ${
           hasPanel
-            ? "lg:basis-[66%] lg:max-w-[66%] lg:opacity-100 lg:translate-x-0"
+            ? "lg:basis-[70%] lg:max-w-[70%] lg:opacity-100 lg:translate-x-0"
             : "lg:basis-0 lg:max-w-0 lg:opacity-0 lg:translate-x-6 lg:pointer-events-none"
         }`}
       >
