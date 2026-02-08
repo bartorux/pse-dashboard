@@ -2717,7 +2717,7 @@ export default function KseLiveDashboard() {
   }, [hasPanel]);
 
   return (
-    <div className="lg:flex lg:items-start lg:gap-6">
+    <div className="lg:flex lg:items-stretch lg:gap-6">
       <section
         className={`space-y-10 transition-all duration-300 ${
           hasPanel
