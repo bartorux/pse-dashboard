@@ -1,0 +1,121 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 210 30% 98%;
+  --foreground: 218 27% 14%;
+  --card: 0 0% 100%;
+  --card-foreground: 218 27% 14%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 218 27% 14%;
+  --primary: 204 80% 42%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 214 28% 90%;
+  --secondary-foreground: 218 27% 14%;
+  --muted: 210 20% 94%;
+  --muted-foreground: 215 16% 42%;
+  --accent: 198 45% 92%;
+  --accent-foreground: 218 27% 14%;
+  --destructive: 0 72% 51%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 214 20% 86%;
+  --input: 214 20% 86%;
+  --ring: 204 80% 42%;
+  --radius: 1.2rem;
+}
+
+* {
+  border-color: hsl(var(--border));
+}
+
+body {
+  background: radial-gradient(circle at top, rgba(214, 236, 255, 0.7), transparent 55%),
+    linear-gradient(160deg, rgba(241, 248, 255, 0.95), rgba(236, 243, 250, 0.9));
+  color: hsl(var(--foreground));
+}
+
+::selection {
+  background: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+}
+
+.prose-muted {
+  color: hsl(var(--muted-foreground));
+}
+
+.glow {
+  position: relative;
+}
+
+.glow::before {
+  content: "";
+  position: absolute;
+  inset: -20%;
+  background: radial-gradient(circle at center, rgba(125, 200, 255, 0.45), transparent 60%);
+  filter: blur(20px);
+  z-index: -1;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.6s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in {
+    animation: none;
+  }
+}
+
+.hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 18px 30px -24px rgba(15, 23, 42, 0.35);
+}
+
+@keyframes chart-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes chart-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-line {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: chart-draw 1.2s ease forwards;
+}
+
+.chart-area {
+  opacity: 0;
+  animation: chart-fade 1.2s ease forwards;
+}
+
+.chart-compare {
+  opacity: 0.55;
+}
