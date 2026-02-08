@@ -39,6 +39,20 @@ body {
   body.kse-panel-open .kse-intro {
     display: none;
   }
+
+  body.kse-panel-open .kse-card {
+    background: rgba(255, 255, 255, 0.65);
+    box-shadow: none;
+  }
+
+  body.kse-panel-open .kse-card-header {
+    padding: 1rem 1.1rem;
+  }
+
+  body.kse-panel-open .kse-card-content,
+  body.kse-panel-open .kse-card-footer {
+    padding: 0 1.1rem 1rem;
+  }
 }
 
 ::selection {

@@ -984,6 +984,7 @@ export default function KseLiveDashboard() {
     peak: null,
     forecast: null
   });
+  const panelAnchorRef = React.useRef<HTMLDivElement | null>(null);
 
   const setSectionRef = React.useCallback(
     (id: SectionId, node: HTMLDivElement | null) => {
@@ -2688,20 +2689,37 @@ export default function KseLiveDashboard() {
 
   const hasPanel = Boolean(panel);
   const metricsGridClass = hasPanel
-    ? "grid gap-4 sm:grid-cols-2 lg:grid-cols-1"
+    ? "grid gap-3 sm:grid-cols-2 lg:grid-cols-1"
     : "grid gap-6 md:grid-cols-2 xl:grid-cols-4";
   const summaryGridClass = hasPanel
-    ? "grid gap-6 lg:grid-cols-1"
+    ? "grid gap-4 lg:grid-cols-1"
     : "grid gap-6 md:grid-cols-2 lg:grid-cols-2";
   const pairGridClass = hasPanel
-    ? "grid gap-6 lg:grid-cols-1"
+    ? "grid gap-4 lg:grid-cols-1"
     : "grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]";
   const bottomGridClass = hasPanel
-    ? "grid gap-6 lg:grid-cols-1"
+    ? "grid gap-4 lg:grid-cols-1"
     : "grid gap-6 md:grid-cols-2 lg:grid-cols-3";
   const summaryBlocksClass = hasPanel
-    ? "grid gap-3 sm:grid-cols-1"
+    ? "grid gap-2 sm:grid-cols-1"
     : "grid gap-3 sm:grid-cols-3";
+
+  const panelNavItems = React.useMemo(
+    () => [
+      { id: "summary", label: "Szybki opis" },
+      { id: "load", label: "Obciazenie" },
+      { id: "trend", label: "Trend" },
+      { id: "peak", label: "Szczyt" },
+      { id: "heatmap", label: "Heatmapa" },
+      { id: "forecast", label: "Prognoza" },
+      { id: "prices", label: "Ceny" },
+      { id: "alerts", label: "Alerty" },
+      { id: "generation", label: "Generacja" },
+      { id: "network", label: "Ograniczenia" },
+      { id: "reserve", label: "Rezerwy" }
+    ],
+    []
+  );
 
   React.useEffect(() => {
     if (typeof document === "undefined") return;
@@ -2716,10 +2734,26 @@ export default function KseLiveDashboard() {
     };
   }, [hasPanel]);
 
+  React.useEffect(() => {
+    if (!activePanel || typeof window === "undefined") return;
+    if (window.innerWidth < 1024) return;
+    const node = panelAnchorRef.current;
+    if (!node) return;
+    const rect = node.getBoundingClientRect();
+    const inView = rect.top >= 0 && rect.top < window.innerHeight * 0.6;
+    if (!inView) {
+      window.requestAnimationFrame(() => {
+        node.scrollIntoView({ behavior: "smooth", block: "start" });
+      });
+    }
+  }, [activePanel]);
+
   return (
     <div className="lg:flex lg:items-stretch lg:gap-6">
       <section
-        className={`space-y-10 transition-all duration-300 ${
+        className={`transition-all duration-300 ${
+          hasPanel ? "space-y-6" : "space-y-10"
+        } ${
           hasPanel
             ? "lg:basis-[30%] lg:max-w-[30%]"
             : "lg:basis-full lg:max-w-full"
@@ -3410,7 +3444,7 @@ export default function KseLiveDashboard() {
             : "lg:basis-0 lg:max-w-0 lg:opacity-0 lg:translate-x-6 lg:pointer-events-none"
         }`}
       >
-        <div className="sticky top-24">
+        <div ref={panelAnchorRef} className="sticky top-24">
           {panel ? (
             <div className="rounded-2xl border border-border/60 bg-white/90 p-5 shadow-xl">
               <div className="flex items-start justify-between gap-3">
@@ -3426,6 +3460,22 @@ export default function KseLiveDashboard() {
                 <Button size="sm" variant="ghost" onClick={() => setActivePanel(null)}>
                   Zamknij
                 </Button>
+              </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {panelNavItems.map((item) => (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActivePanel(item.id)}
+                    className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                      activePanel === item.id
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
               </div>
               <div className="mt-4 max-h-[calc(100vh-10rem)] overflow-auto overflow-x-hidden pr-1">
                 {panel.content}
@@ -3449,6 +3499,22 @@ export default function KseLiveDashboard() {
             <Button size="sm" variant="ghost" onClick={() => setActivePanel(null)}>
               Zamknij
             </Button>
+          </div>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {panelNavItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => setActivePanel(item.id)}
+                className={`rounded-full border px-3 py-1 text-[11px] font-medium transition ${
+                  activePanel === item.id
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border/70 bg-white/70 text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
           </div>
           <div className="mt-3 max-h-[55vh] overflow-auto overflow-x-hidden pr-1">
             {panel.content}
